@@ -37,7 +37,7 @@ message User {
 }
 
 message StoreRequest {
-    User note = 1;
+    UserInfo note = 1;
 }
 message StoreResponse {
     int64 id = 1;
