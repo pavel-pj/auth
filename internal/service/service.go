@@ -1,10 +1,10 @@
 package service
 
 import (
-	desc "auth/pkg/user_v1"
+	"auth/internal/model"
 	"context"
 )
 
 type UserService interface {
-	Store(ctx context.Context, user *desc.UserInfo) (int64, error)
+	Store(ctx context.Context, user model.User) (int64, error)
 }

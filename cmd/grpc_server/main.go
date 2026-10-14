@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	converter "auth/internal/converter/user"
 	service "auth/internal/service"
 	desc "auth/pkg/user_v1"
 )
@@ -22,12 +23,12 @@ type server struct {
 
 func (s *server) Store(ctx context.Context, req *desc.StoreRequest) (*desc.StoreResponse, error) {
 
-	data := req.GetUser()
-	result, err := s.serv.Store(ctx, data)
+	user := converter.ToUserFromProto(req.GetUser())
+	result, err := s.serv.Store(ctx, user)
 	if err != nil {
 		return &desc.StoreResponse{}, err
 	}
-	fmt.Println(data)
+	//fmt.Println(data)
 
 	return &desc.StoreResponse{Id: result}, nil
 }

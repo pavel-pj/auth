@@ -1,12 +1,12 @@
 package repository
 
 import (
-	desc "auth/pkg/user_v1"
+	model "auth/internal/repository/user/model"
 	"context"
 )
 
 type UserRepository interface {
-	Store(ctx context.Context, users *desc.UserInfo) (int64, error)
+	Store(ctx context.Context, users model.User) (int64, error)
 	//Delete(ctx context.Context, id int64) error
 	//Get(ctx context.Context, id int64) (*desc.User, error)
 }
