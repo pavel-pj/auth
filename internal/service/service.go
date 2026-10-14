@@ -6,5 +6,5 @@ import (
 )
 
 type UserService interface {
-	Store(ctx context.Context, users *desc.UserInfo) (int64, error)
+	Store(ctx context.Context, user *desc.UserInfo) (int64, error)
 }

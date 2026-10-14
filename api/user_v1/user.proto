@@ -5,14 +5,15 @@ package user_v1;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
+//import "buf/validate/validate.proto";
 
 option go_package = "auth/pkg/user_v1;user_v1";
 
 service UserV1 {
-    rpc Get(GetRequest) returns (GetResponse);
+    //rpc Get(GetRequest) returns (GetResponse);
     rpc Store(StoreRequest) returns (StoreResponse);
-    rpc Update(UpdateRequest) returns (UpdateResponse);
-    rpc Delete(DeleteRequest) returns (DeleteResponse);
+  //  rpc Update(UpdateRequest) returns (UpdateResponse);
+   // rpc Delete(DeleteRequest) returns (DeleteResponse);
   }
 
   enum Roles {
@@ -22,7 +23,7 @@ service UserV1 {
 }
 
 message UserInfo {
-    string name = 1;
+    string name = 1  ;
     string email  = 2;
     string password = 3;
     string password_confirm = 4;
@@ -37,7 +38,7 @@ message User {
 }
 
 message StoreRequest {
-    UserInfo note = 1;
+    UserInfo user = 1;
 }
 message StoreResponse {
     int64 id = 1;
@@ -50,7 +51,7 @@ message GetRequest {
 }
 
 message GetResponse {
-    User note = 1;
+    User user= 1;
   
 }
 

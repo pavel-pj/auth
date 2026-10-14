@@ -3,6 +3,7 @@ services:
     image: postgres:18
     container_name: postgres-auth
     restart: unless-stopped
+    env_file: .env  
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -11,6 +12,7 @@ services:
        - "${PG_PORT}:5432"
     volumes:
       - pgdata:/var/lib/postgresql
+ 
 
 volumes:
   pgdata:

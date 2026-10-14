@@ -10,19 +10,19 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 
-generate: generate-chat-api
+generate: generate-user-api
 
-generate-chat-api:
-	mkdir -p pkg/chat_v1
-	protoc --proto_path api/chat_v1 \
-	--go_out=pkg/chat_v1 --go_opt=paths=source_relative \
+generate-user-api:
+	mkdir -p pkg/user_v1
+	protoc --proto_path api/user_v1 \
+	--go_out=pkg/user_v1 --go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
-	--go-grpc_out=pkg/chat_v1 --go-grpc_opt=paths=source_relative \
+	--go-grpc_out=pkg/user_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
-	api/chat_v1/chat.proto
+	api/user_v1/user.proto
 
 server-up:
-	go run internal/grpc_server/main.go
+	go run cmd/grpc_server/main.go
 
 
 goose-status:
