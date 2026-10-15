@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserV1Client interface {
-	//rpc Get(GetRequest) returns (GetResponse);
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error)
 }
 
@@ -32,6 +32,15 @@ type userV1Client struct {
 
 func NewUserV1Client(cc grpc.ClientConnInterface) UserV1Client {
 	return &userV1Client{cc}
+}
+
+func (c *userV1Client) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
+	out := new(GetResponse)
+	err := c.cc.Invoke(ctx, "/user_v1.UserV1/Get", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *userV1Client) Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error) {
@@ -47,7 +56,7 @@ func (c *userV1Client) Store(ctx context.Context, in *StoreRequest, opts ...grpc
 // All implementations must embed UnimplementedUserV1Server
 // for forward compatibility
 type UserV1Server interface {
-	//rpc Get(GetRequest) returns (GetResponse);
+	Get(context.Context, *GetRequest) (*GetResponse, error)
 	Store(context.Context, *StoreRequest) (*StoreResponse, error)
 	mustEmbedUnimplementedUserV1Server()
 }
@@ -56,6 +65,9 @@ type UserV1Server interface {
 type UnimplementedUserV1Server struct {
 }
 
+func (UnimplementedUserV1Server) Get(context.Context, *GetRequest) (*GetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
 func (UnimplementedUserV1Server) Store(context.Context, *StoreRequest) (*StoreResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Store not implemented")
 }
@@ -70,6 +82,24 @@ type UnsafeUserV1Server interface {
 
 func RegisterUserV1Server(s grpc.ServiceRegistrar, srv UserV1Server) {
 	s.RegisterService(&UserV1_ServiceDesc, srv)
+}
+
+func _UserV1_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserV1Server).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_v1.UserV1/Get",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserV1Server).Get(ctx, req.(*GetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _UserV1_Store_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -97,6 +127,10 @@ var UserV1_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "user_v1.UserV1",
 	HandlerType: (*UserV1Server)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Get",
+			Handler:    _UserV1_Get_Handler,
+		},
 		{
 			MethodName: "Store",
 			Handler:    _UserV1_Store_Handler,

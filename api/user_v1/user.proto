@@ -10,7 +10,7 @@ import "google/protobuf/wrappers.proto";
 option go_package = "auth/pkg/user_v1;user_v1";
 
 service UserV1 {
-    //rpc Get(GetRequest) returns (GetResponse);
+    rpc Get(GetRequest) returns (GetResponse);
     rpc Store(StoreRequest) returns (StoreResponse);
   //  rpc Update(UpdateRequest) returns (UpdateResponse);
    // rpc Delete(DeleteRequest) returns (DeleteResponse);

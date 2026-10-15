@@ -7,4 +7,5 @@ import (
 
 type UserService interface {
 	Store(ctx context.Context, user model.User) (int64, error)
+	Get(ctx context.Context, id int64) (model.User, error)
 }

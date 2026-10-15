@@ -1,9 +1,9 @@
 package model
 
 type User struct {
-	Name            string
-	Email           string
-	Password        string
-	PasswordConfirm string
-	Roles           string
+	ID       int64
+	Name     string
+	Email    string
+	Password string
+	Roles    string
 }

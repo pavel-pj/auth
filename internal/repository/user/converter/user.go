@@ -2,16 +2,25 @@ package converter
 
 import (
 	modelService "auth/internal/model"
-	model "auth/internal/repository/user/model"
+	modelRepo "auth/internal/repository/user/model"
 )
 
-func ToRepoUserFromService(data modelService.User) model.User {
+func ToRepoUserFromService(data modelService.User) modelRepo.User {
 
-	return model.User{
+	return modelRepo.User{
 		Name:     data.Name,
 		Email:    data.Email,
 		Password: data.Password,
 		Roles:    data.Roles,
 	}
 
+}
+
+func ToServiceFromRepoUser(data modelRepo.User) modelService.User {
+	return modelService.User{
+		ID:    data.ID,
+		Name:  data.Name,
+		Email: data.Email,
+		Roles: data.Roles,
+	}
 }

@@ -18,6 +18,7 @@ type UserRepository struct {
 
 const (
 	tableName      = "users"
+	idColumn       = "id"
 	columnName     = "name"
 	columnEmail    = "email"
 	columnPassword = "password"
@@ -53,5 +54,31 @@ func (r *UserRepository) Store(ctx context.Context, user model.User) (int64, err
 	}
 
 	return id, nil
+
+}
+
+func (r *UserRepository) Get(ctx context.Context, id int64) (model.User, error) {
+
+	sqlstr, args, err := psql.Select().
+		From(tableName).
+		Columns(idColumn, columnName, columnEmail, columnRole).
+		Where(sq.Eq{idColumn: id}).
+		ToSql()
+	if err != nil {
+		return model.User{}, err
+	}
+
+	var user model.User
+	err = r.DB.QueryRow(ctx, sqlstr, args...).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Roles,
+	)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	return user, nil
 
 }
