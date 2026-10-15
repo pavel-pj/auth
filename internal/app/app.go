@@ -22,10 +22,10 @@ type App struct {
 	Pool     *pgxpool.Pool
 }
 
-func NewApp(cfg config.Config) (*App, error) {
+func NewApp(pg config.PGConfig, grpc config.GRPCConfig) (*App, error) {
 	// Создаем пул соединений pgx
 
-	dbURL := "host=" + cfg.DBHost + " port=" + cfg.DBPort + " user=" + cfg.DBUser + " password=" + cfg.DBPassword + " dbname=" + cfg.DBName + " sslmode=disable"
+	dbURL := pg.DSN()
 
 	pool, err := pgxpool.New(context.Background(), dbURL)
 	if err != nil {

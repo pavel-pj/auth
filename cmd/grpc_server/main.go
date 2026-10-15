@@ -2,7 +2,7 @@ package main
 
 import (
 	"auth/internal/app"
-	"auth/internal/config"
+	"auth/internal/config/env"
 	"fmt"
 	"log"
 	"net"
@@ -15,13 +15,18 @@ import (
 )
 
 func main() {
-	cfg, err := config.Load()
+	PGCfg, err := env.NewPGConfig()
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	GRPCCfg, err := env.NewGRPCConfig()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
 	// Создаём приложение
-	app, err := app.NewApp(*cfg)
+	app, err := app.NewApp(PGCfg, GRPCCfg)
 	if err != nil {
 		log.Fatal("Failed to create app: ", err)
 	}
@@ -33,7 +38,7 @@ func main() {
 
 	log.Printf("✅ Successful connect to PostgreSQL")
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.ServerPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", GRPCCfg.Port()))
 	if err != nil {
 		log.Fatal("Server could not be run")
 	}
@@ -42,7 +47,7 @@ func main() {
 	reflection.Register(s)
 	desc.RegisterUserV1Server(s, userApi.NewUserImplimentation(app.Services))
 
-	log.Printf("✅ Server listening at %s", cfg.ServerPort)
+	log.Printf("✅ Server listening at %s", GRPCCfg.Port())
 	if err = s.Serve(lis); err != nil {
 		log.Fatalf("failed to server: ", err)
 	}
