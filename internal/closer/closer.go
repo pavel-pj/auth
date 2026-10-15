@@ -1,13 +1,17 @@
 package closer
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"sync"
+	"syscall"
 )
 
-var globalCloser = New()
+//var globalCloser = New()
+
+var globalCloser = New(os.Interrupt, syscall.SIGTERM)
 
 func Add(f ...func() error) {
 	globalCloser.Add(f...)
@@ -29,6 +33,7 @@ type Closer struct {
 }
 
 func New(sig ...os.Signal) *Closer {
+
 	c := &Closer{done: make(chan struct{})}
 
 	if len(sig) > 0 {
@@ -57,6 +62,7 @@ func (c *Closer) Wait() {
 }
 
 func (c *Closer) CloseAll() {
+
 	c.once.Do(func() {
 		defer close(c.done)
 
@@ -64,7 +70,7 @@ func (c *Closer) CloseAll() {
 		funcs := c.funcs
 		c.funcs = nil
 		c.mu.Unlock()
-
+		fmt.Println("ЗАКРЫВАЕМ ВСЕ__1")
 		errs := make(chan error, len(funcs))
 		for _, f := range funcs {
 			go func(f func() error) {

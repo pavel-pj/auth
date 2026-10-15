@@ -88,6 +88,11 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	reflection.Register(a.grpcServer)
 	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.GetUserImplimentation(ctx))
 
+	closer.Add(func() error {
+		a.grpcServer.GracefulStop()
+		return nil
+	})
+
 	return nil
 }
 
