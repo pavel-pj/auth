@@ -37,7 +37,7 @@ func NewApp(ctx context.Context) (*App, error) {
 
 	err := a.initDeps(ctx)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return a, nil
@@ -62,7 +62,7 @@ func (a *App) initDeps(ctx context.Context) error {
 	for _, f := range inits {
 		err := f(ctx)
 		if err != nil {
-			return nil
+			return err
 		}
 	}
 
@@ -74,6 +74,7 @@ func (a *App) initConfig(_ context.Context) error {
 	if err != nil {
 		return nil
 	}
+
 	return nil
 }
 
