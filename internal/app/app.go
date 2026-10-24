@@ -72,7 +72,7 @@ func (a *App) initDeps(ctx context.Context) error {
 func (a *App) initConfig(_ context.Context) error {
 	err := env.Load(".env")
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return nil
@@ -84,9 +84,11 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
-	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
 
+	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	grpc.UnaryInterceptor(recoveryInterceptor)
 	reflection.Register(a.grpcServer)
+
 	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.GetUserImplimentation(ctx))
 
 	closer.Add(func() error {
