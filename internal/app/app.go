@@ -85,8 +85,10 @@ func (a *App) initServiceProvider(_ context.Context) error {
 
 func (a *App) initGRPCServer(ctx context.Context) error {
 
-	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
-	grpc.UnaryInterceptor(recoveryInterceptor)
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.ChainUnaryInterceptor(recoveryInterceptor),
+	)
 	reflection.Register(a.grpcServer)
 
 	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.GetUserImplimentation(ctx))

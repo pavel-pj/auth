@@ -46,7 +46,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose.yaml"
-          target: "/var/www/go-chat"
+          target: "/var/www/html/go/auth"
           overwrite: true
 
       - name: Deploy to server
@@ -59,6 +59,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: DOCKERHUB_USERNAME
           script: |
-            cd /var/www/go-chat
+            cd /var/www/html/go/auth
             docker compose pull
             docker compose up -d

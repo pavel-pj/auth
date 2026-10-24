@@ -79,6 +79,8 @@ func (r *UserRepository) Get(ctx context.Context, id int64) (model.User, error) 
 		return model.User{}, err
 	}
 
+	panic("internal error")
+
 	return user, nil
 
 }
