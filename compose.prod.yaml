@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
     env_file: .env
     ports:
-      - "${SERVER_PORT}:50301"
+      - "${SERVER_PORT}:50560"
     depends_on:
       postgres:
         condition: service_healthy
