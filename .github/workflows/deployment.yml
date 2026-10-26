@@ -60,5 +60,5 @@ jobs:
           envs: DOCKERHUB_USERNAME
           script: |
             cd /var/www/html/go/auth
-            docker compose pull
-            docker compose up -d
+            docker compose -f compose.prod.yaml pull
+            docker compose -f compose.prod.yaml up -d
