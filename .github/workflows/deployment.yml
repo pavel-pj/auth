@@ -45,7 +45,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "compose.prod.yaml" 
+          source: "compose.prod.yaml"
           target: "/var/www/html/go/auth"
           overwrite: true
 
