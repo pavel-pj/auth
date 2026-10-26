@@ -19,8 +19,8 @@ func NewGRPCConfig() (GRPCConfig, error) {
 	}
 
 	cfg := GRPCConfig{}
-	cfg.host = getEnv("SERVER_HOST", "50560")
-	cfg.port = getEnv("SERVER_PORT", "88888")
+	cfg.host = getEnv("SERVER_HOST", "")
+	cfg.port = getEnv("SERVER_PORT", "50560")
 
 	return cfg, nil
 }

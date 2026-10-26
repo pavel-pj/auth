@@ -27,7 +27,7 @@ func NewPGConfig() (PGConfig, error) {
 	cfg.DBPassword = getEnv("POSTGRES_PASSWORD", "password")
 	cfg.DBName = getEnv("POSTGRES_DB", "app")
 	cfg.DBHost = getEnv("DB_HOST", "localhost")
-	cfg.DBPort = getEnv("PG_PORT", "5432")
+	cfg.DBPort = getEnv("DB_PORT", "5432")
 
 	return cfg, nil
 }
