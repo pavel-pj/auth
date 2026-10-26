@@ -89,6 +89,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 		grpc.Creds(insecure.NewCredentials()),
 		grpc.ChainUnaryInterceptor(recoveryInterceptor),
 	)
+	// Только для тестовой среды - для удобства работы в Postman
 	reflection.Register(a.grpcServer)
 
 	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.GetUserImplimentation(ctx))

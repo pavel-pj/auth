@@ -1,7 +1,6 @@
 package closer
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -43,8 +42,8 @@ func New(sig ...os.Signal) *Closer {
 			<-ch
 			signal.Stop(ch)
 			c.CloseAll()
-
 		}()
+
 	}
 
 	return c
@@ -70,7 +69,7 @@ func (c *Closer) CloseAll() {
 		funcs := c.funcs
 		c.funcs = nil
 		c.mu.Unlock()
-		fmt.Println("ЗАКРЫВАЕМ ВСЕ__1")
+		//fmt.Println("ЗАКРЫВАЕМ ВСЕ__1")
 		errs := make(chan error, len(funcs))
 		for _, f := range funcs {
 			go func(f func() error) {
