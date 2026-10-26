@@ -13,12 +13,12 @@ func main() {
 
 	app, err := a.NewApp(ctx)
 	if err != nil {
-		log.Fatalf("Fail to init app:%w", err)
+		log.Fatalf("Fail to init app:%v", err)
 	}
 
 	err = app.Run()
 	if err != nil {
-		log.Fatalf("Fail to start app:%w", err)
+		log.Fatalf("Fail to start app:%v", err)
 	}
 
 }
