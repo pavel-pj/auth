@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+// старт приложения
 func main() {
 
 	ctx := context.Background()
