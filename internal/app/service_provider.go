@@ -53,11 +53,14 @@ import (
 	implSerivce "auth/internal/api/user"
 	db "auth/internal/client/db"
 	pg "auth/internal/client/db/pg"
+	"auth/internal/client/db/transaction"
 	_ "auth/internal/closer"
 	env "auth/internal/config/env"
 	repository "auth/internal/repository"
+	logRepo "auth/internal/repository/log"
 	userRepo "auth/internal/repository/user"
 	service "auth/internal/service"
+	logServ "auth/internal/service/log"
 	userServ "auth/internal/service/user"
 )
 
@@ -66,10 +69,14 @@ type serviceProvider struct {
 	grpcConfig config.GRPCConfig
 
 	//pgPool *pgxpool.Pool
-	pgClient db.Client
+	pgClient  db.Client
+	txManager db.TxManager
 
-	userReoisitory repository.UserRepository
-	userService    service.UserService
+	userRepository repository.UserRepository
+	logRepository  repository.LogRepository
+
+	userService service.UserService
+	logService  service.LogService
 
 	userImpl *grpcApi.Implementation
 }
@@ -134,18 +141,44 @@ func (s *serviceProvider) GetDBClient(ctx context.Context) db.Client {
 	return s.pgClient
 }
 
-func (s *serviceProvider) GetUserReoisitory(ctx context.Context) repository.UserRepository {
-	if s.userReoisitory == nil {
-		s.userReoisitory = userRepo.NewUserRepository(s.GetDBClient(ctx))
+func (s *serviceProvider) GetTxManager(ctx context.Context) db.TxManager {
+	if s.txManager == nil {
+		s.txManager = transaction.NewTransationManager(s.GetDBClient(ctx).DB())
 	}
-	return s.userReoisitory
+
+	return s.txManager
+}
+
+func (s *serviceProvider) GetUserRepository(ctx context.Context) repository.UserRepository {
+
+	if s.userRepository == nil {
+		s.userRepository = userRepo.NewUserRepository(s.GetDBClient(ctx))
+	}
+
+	return s.userRepository
+}
+
+func (s *serviceProvider) GetLogRepository(ctx context.Context) repository.LogRepository {
+	if s.logRepository == nil {
+		s.logRepository = logRepo.NewLogRepository(s.GetDBClient(ctx))
+
+	}
+	return s.logRepository
 }
 
 func (s *serviceProvider) GetUserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
-		s.userService = userServ.NewUserService(s.GetUserReoisitory(ctx))
+		s.userService = userServ.NewUserService(s.GetUserRepository(ctx), s.GetTxManager(ctx), s.GetLogService(ctx))
 	}
 	return s.userService
+}
+
+func (s *serviceProvider) GetLogService(ctx context.Context) service.LogService {
+	if s.logService == nil {
+		s.logService = logServ.NewLogService(s.GetLogRepository(ctx), s.GetTxManager(ctx))
+	}
+
+	return s.logService
 }
 
 func (s *serviceProvider) GetUserImplimentation(ctx context.Context) *grpcApi.Implementation {

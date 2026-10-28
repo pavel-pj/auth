@@ -1,13 +1,18 @@
 package repository
 
 import (
-	model "auth/internal/repository/user/model"
+	logModel "auth/internal/repository/log/model"
+	userModel "auth/internal/repository/user/model"
 	"context"
 )
 
 type UserRepository interface {
-	Store(ctx context.Context, users model.User) (int64, error)
-	Get(ctx context.Context, id int64) (model.User, error)
+	Store(ctx context.Context, users userModel.User) (int64, error)
+	Get(ctx context.Context, id int64) (userModel.User, error)
 	//Delete(ctx context.Context, id int64) error
 	//Get(ctx context.Context, id int64) (*desc.User, error)
+}
+
+type LogRepository interface {
+	Store(ctx context.Context, logs logModel.Log) error
 }

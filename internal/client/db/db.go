@@ -7,6 +7,8 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
+type Handler func(ctx context.Context) error
+
 // Интефес Client
 type Client interface {
 	DB() DB
@@ -16,8 +18,18 @@ type Client interface {
 // Интефес DB
 type DB interface {
 	SQLExecer
+	Transactor
 	Pinger
 	Close()
+}
+
+type TxManager interface {
+	ReadCommitted(ctx context.Context, f Handler) error
+}
+
+// Интефейс для работы с транзакциями
+type Transactor interface {
+	BeginTx(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error)
 }
 
 type Query struct {
