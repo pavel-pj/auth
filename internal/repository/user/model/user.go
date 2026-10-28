@@ -5,5 +5,5 @@ type User struct {
 	Name     string `db:"name"`
 	Email    string `db:"email"`
 	Password string `db:"password"`
-	Roles    string `db:"roles"`
+	Roles    string `db:"role"`
 }

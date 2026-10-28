@@ -67,6 +67,7 @@ func (r *UserRepository) Get(ctx context.Context, id int64) (model.User, error) 
 		From(tableName).
 		Columns(idColumn, columnName, columnEmail, columnRole).
 		Where(sq.Eq{idColumn: id}).
+		Limit(1).
 		ToSql()
 	if err != nil {
 		return model.User{}, err
@@ -78,12 +79,7 @@ func (r *UserRepository) Get(ctx context.Context, id int64) (model.User, error) 
 	}
 
 	var user model.User
-	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(
-		&user.ID,
-		&user.Name,
-		&user.Email,
-		&user.Roles,
-	)
+	err = r.db.DB().ScanOneContext(ctx, &user, q, args...)
 	if err != nil {
 		return model.User{}, err
 	}
