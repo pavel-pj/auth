@@ -7,9 +7,17 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
+// Интефес Client
 type Client interface {
-	DB()
+	DB() DB
 	Close() error
+}
+
+// Интефес DB
+type DB interface {
+	SQLExecer
+	Pinger
+	Close()
 }
 
 type Query struct {
@@ -28,17 +36,11 @@ type NamedExecer interface {
 }
 
 type QueryExecer interface {
-	ExecContext(ctx context.Context, dest any, q Query, args ...any) (pgconn.CommandTag, error)
-	QueryContext(ctx context.Context, dest any, q Query, args ...any) (pgx.Rows, error)
-	QueryRowContext(ctx context.Context, dest any, q Query, args ...any) pgx.Rows
+	ExecContext(ctx context.Context, q Query, args ...any) (pgconn.CommandTag, error)
+	QueryContext(ctx context.Context, q Query, args ...any) (pgx.Rows, error)
+	QueryRowContext(ctx context.Context, q Query, args ...any) pgx.Row
 }
 
 type Pinger interface {
 	Ping(ctx context.Context) error
-}
-
-type DB interface {
-	SQLExecer
-	Pinger
-	Close()
 }

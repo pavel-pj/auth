@@ -1,19 +1,18 @@
 package user
 
 import (
+	db "auth/internal/client/db"
+	model "auth/internal/repository/user/model"
 	"context"
 	"log"
 
-	model "auth/internal/repository/user/model"
-
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v5/pgxpool"
 
 	repo "auth/internal/repository"
 )
 
 type UserRepository struct {
-	DB *pgxpool.Pool
+	db db.Client
 }
 
 const (
@@ -27,9 +26,9 @@ const (
 
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
-func NewUserRepository(DB *pgxpool.Pool) repo.UserRepository {
+func NewUserRepository(db db.Client) repo.UserRepository {
 	return &UserRepository{
-		DB: DB,
+		db: db,
 	}
 }
 
@@ -46,8 +45,13 @@ func (r *UserRepository) Store(ctx context.Context, user model.User) (int64, err
 		return 0, err
 	}
 
+	q := db.Query{
+		Name:     "user_repository.Store",
+		QueryRow: sqlStr,
+	}
+
 	var id int64
-	err = r.DB.QueryRow(ctx, sqlStr, arg...).Scan(&id)
+	err = r.db.DB().QueryRowContext(ctx, q, arg...).Scan(&id)
 	if err != nil {
 		log.Println("Repository.Could not create user:", err)
 		return 0, err
@@ -68,8 +72,13 @@ func (r *UserRepository) Get(ctx context.Context, id int64) (model.User, error) 
 		return model.User{}, err
 	}
 
+	q := db.Query{
+		Name:     "user_repository.Get",
+		QueryRow: sqlstr,
+	}
+
 	var user model.User
-	err = r.DB.QueryRow(ctx, sqlstr, args...).Scan(
+	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
