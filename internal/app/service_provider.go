@@ -117,7 +117,7 @@ func (s *serviceProvider) GetDBClient(ctx context.Context) db.Client {
 	if s.pgClient == nil {
 
 		client, err := pg.New(context.Background(), s.GetPGConfig().DSN())
-		//log.Println("SQL:SERVVVV")
+
 		if err != nil {
 			log.Fatalf("failed to connect to database: %s", err.Error())
 		}
