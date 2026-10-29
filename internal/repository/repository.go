@@ -7,6 +7,7 @@ import (
 )
 
 type UserRepository interface {
+	Index(ctx context.Context, limit, offset uint64) ([]userModel.User, error)
 	Store(ctx context.Context, users userModel.User) (int64, error)
 	Get(ctx context.Context, id int64) (userModel.User, error)
 	Delete(ctx context.Context, id int64) (int64, error)

@@ -10,6 +10,7 @@ import "google/protobuf/wrappers.proto";
 option go_package = "auth/pkg/user_v1;user_v1";
 
 service UserV1 {
+    rpc Index(IndexRequest) returns (IndexResponse);
     rpc Get(GetRequest) returns (GetResponse);
     rpc Store(StoreRequest) returns (StoreResponse);
     rpc Update(UpdateRequest) returns (UpdateResponse);
@@ -44,6 +45,14 @@ message StoreResponse {
     int64 id = 1;
 }
 
+message IndexRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+}
+
+message IndexResponse {
+    repeated User user= 1;
+}
  
 
 message GetRequest {

@@ -24,7 +24,7 @@ type pg struct {
 }
 
 func (p *pg) ScanOneContext(ctx context.Context, dest any, q db.Query, args ...any) error {
-	logQuery(ctx, q, args...)
+	//logQuery(ctx, q, args...)
 
 	row, err := p.QueryContext(ctx, q, args...)
 	if err != nil {
@@ -35,7 +35,7 @@ func (p *pg) ScanOneContext(ctx context.Context, dest any, q db.Query, args ...a
 }
 
 func (p *pg) ScanAllContext(ctx context.Context, dest any, q db.Query, args ...any) error {
-	logQuery(ctx, q, args...)
+	//logQuery(ctx, q, args...)
 
 	rows, err := p.QueryContext(ctx, q, args...)
 	if err != nil {
