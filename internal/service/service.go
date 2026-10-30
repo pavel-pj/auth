@@ -3,10 +3,7 @@ package service
 import (
 	"auth/internal/model"
 	"context"
-	"errors"
 )
-
-var ErrNotFound = errors.New("entity not found")
 
 type UserService interface {
 	Index(ctx context.Context, limit, offset uint64) ([]model.User, error)

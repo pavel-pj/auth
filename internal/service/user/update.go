@@ -5,11 +5,6 @@ import (
 	"fmt"
 
 	"context"
-	"errors"
-
-	serv "auth/internal/service"
-
-	"github.com/jackc/pgx/v5"
 )
 
 func (s UserService) Update(ctx context.Context, user model.UserPatch) (model.User, error) {
@@ -21,16 +16,16 @@ func (s UserService) Update(ctx context.Context, user model.UserPatch) (model.Us
 		var errTx error
 		updatedUser, errTx = s.Repository.Update(ctx, user)
 		if errTx != nil {
-			if errors.Is(errTx, pgx.ErrNoRows) {
-				return serv.ErrNotFound
-			}
-			return nil
+			return errTx
 		}
 
-		s.logService.Store(ctx, model.Log{
+		errTx = s.logService.Store(ctx, model.Log{
 			Level:   "info",
 			Message: fmt.Sprintf("user_update.%s", createUpdateLog(user)),
 		})
+		if errTx != nil {
+			return errTx
+		}
 
 		return nil
 	})

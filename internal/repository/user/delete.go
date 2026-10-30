@@ -27,5 +27,9 @@ func (r *UserRepository) Delete(ctx context.Context, id int64) (int64, error) {
 		return 0, err
 	}
 
+	if rows.RowsAffected() == 0 {
+		return 0, ErrNotFound
+	}
+
 	return rows.RowsAffected(), err
 }

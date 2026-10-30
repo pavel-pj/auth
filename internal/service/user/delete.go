@@ -2,7 +2,6 @@ package user
 
 import (
 	"auth/internal/model"
-	serv "auth/internal/service"
 	"context"
 	"fmt"
 )
@@ -10,12 +9,9 @@ import (
 func (s UserService) Delete(ctx context.Context, id int64) error {
 
 	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
-		rows, err := s.Repository.Delete(ctx, id)
+		_, err := s.Repository.Delete(ctx, id)
 		if err != nil {
 			return err
-		}
-		if rows == 0 {
-			return serv.ErrNotFound
 		}
 
 		errLog := s.logService.Store(ctx, model.Log{

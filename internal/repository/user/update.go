@@ -38,9 +38,10 @@ func (r *UserRepository) Update(ctx context.Context, user model.UserPatch) (mode
 	var row modelRepo.User
 
 	err = r.db.DB().ScanOneContext(ctx, &row, q, args...)
+
 	if err != nil {
 
-		return model.User{}, err
+		return model.User{}, translateError(err)
 
 	}
 
