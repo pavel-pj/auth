@@ -13,6 +13,7 @@ type UserService interface {
 	Store(ctx context.Context, user model.UserCreate) (int64, error)
 	Get(ctx context.Context, id int64) (model.User, error)
 	Delete(ctx context.Context, id int64) error
+	Update(ctx context.Context, user model.UserPatch) (model.User, error)
 }
 
 type LogService interface {

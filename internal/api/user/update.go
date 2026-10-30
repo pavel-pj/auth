@@ -2,14 +2,18 @@ package user
 
 import (
 	converter "auth/internal/converter/user"
-	"auth/internal/model"
 	desc "auth/pkg/user_v1"
 	"context"
 )
 
 func (s *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*desc.UpdateResponse, error) {
 
-	//user := converter.ToUserPatchFromProto(req)
-	return &desc.UpdateResponse{User: converter.ToProtoUserFromService(model.User{})}, nil
+	data := converter.ToUserPatchFromProto(req)
+	updated, err := s.serv.Update(ctx, data)
+	if err != nil {
+		return &desc.UpdateResponse{}, err
+	}
+
+	return &desc.UpdateResponse{User: converter.ToProtoUserFromService(updated)}, nil
 
 }

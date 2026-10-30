@@ -14,7 +14,6 @@ func (s UserService) Delete(ctx context.Context, id int64) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("rows:%d", rows)
 		if rows == 0 {
 			return serv.ErrNotFound
 		}
