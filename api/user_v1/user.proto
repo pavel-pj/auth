@@ -23,23 +23,29 @@ service UserV1 {
    
 }
 
-message UserInfo {
+message UserCreate {
+    UserData info = 1;
+    string password = 2;
+    string password_confirm = 3;
+    
+}
+
+message UserData {
     string name = 1  ;
     string email  = 2;
-    string password = 3;
-    string password_confirm = 4;
-    Roles roles = 5;
+    Roles roles = 3;
 }
+
 
 message User {
     int64 id = 1;
-    UserInfo info = 2;
+    UserData info = 2;
     google.protobuf.Timestamp created_at= 3;
     google.protobuf.Timestamp updated_at= 4;
 }
 
 message StoreRequest {
-    UserInfo user = 1;
+    UserCreate user = 1;
 }
 message StoreResponse {
     int64 id = 1;
@@ -68,9 +74,11 @@ message UpdateRequest {
     int64 id = 1;
     google.protobuf.StringValue name = 2;
     google.protobuf.StringValue email = 3;
+    optional Roles roles = 4;  
 }
 
 message UpdateResponse {
+    User user= 1;
    }
 
 message DeleteRequest {
@@ -78,6 +86,6 @@ message DeleteRequest {
 }
 
 message DeleteResponse {
-     User user= 1;
+   
    }
  

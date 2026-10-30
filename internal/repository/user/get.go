@@ -2,7 +2,9 @@ package user
 
 import (
 	db "auth/internal/client/db"
-	model "auth/internal/repository/user/model"
+	"auth/internal/model"
+	"auth/internal/repository/user/converter"
+	modelRepo "auth/internal/repository/user/model"
 	"context"
 
 	sq "github.com/Masterminds/squirrel"
@@ -12,7 +14,7 @@ func (r *UserRepository) Get(ctx context.Context, id int64) (model.User, error) 
 
 	sqlstr, args, err := psql.Select().
 		From(tableName).
-		Columns(idColumn, columnName, columnEmail, columnRole).
+		Columns(idColumn, columnName, columnEmail, columnRole, columnCreatedAt, columnUpdatedAt).
 		Where(sq.Eq{idColumn: id}).
 		Limit(1).
 		ToSql()
@@ -25,12 +27,12 @@ func (r *UserRepository) Get(ctx context.Context, id int64) (model.User, error) 
 		QueryRow: sqlstr,
 	}
 
-	var user model.User
+	var user modelRepo.User
 	err = r.db.DB().ScanOneContext(ctx, &user, q, args...)
 	if err != nil {
 		return model.User{}, err
 	}
 
-	return user, nil
+	return converter.ToServiceFromRepoUser(user), nil
 
 }

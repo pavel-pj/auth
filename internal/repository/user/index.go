@@ -2,7 +2,9 @@ package user
 
 import (
 	db "auth/internal/client/db"
-	model "auth/internal/repository/user/model"
+	"auth/internal/model"
+	"auth/internal/repository/user/converter"
+	modelRepo "auth/internal/repository/user/model"
 	"context"
 	"log"
 )
@@ -11,7 +13,7 @@ func (r *UserRepository) Index(ctx context.Context, limit, offset uint64) ([]mod
 
 	sqlStr, args, err := psql.Select().
 		From(tableName).
-		Columns(idColumn, columnName, columnEmail, columnRole).
+		Columns(idColumn, columnName, columnEmail, columnRole, columnCreatedAt, columnUpdatedAt).
 		OrderBy(idColumn).
 		Limit(limit).
 		Offset(offset).
@@ -27,10 +29,16 @@ func (r *UserRepository) Index(ctx context.Context, limit, offset uint64) ([]mod
 		QueryRow: sqlStr,
 	}
 
-	var users []model.User
-	err = r.db.DB().ScanAllContext(ctx, &users, q, args...)
+	var usersRepo []modelRepo.User
+	err = r.db.DB().ScanAllContext(ctx, &usersRepo, q, args...)
 	if err != nil {
 		return []model.User{}, err
+	}
+
+	var users []model.User
+
+	for _, u := range usersRepo {
+		users = append(users, converter.ToServiceFromRepoUser(u))
 	}
 
 	return users, nil

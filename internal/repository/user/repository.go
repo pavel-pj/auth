@@ -12,12 +12,14 @@ type UserRepository struct {
 }
 
 const (
-	tableName      = "users"
-	idColumn       = "id"
-	columnName     = "name"
-	columnEmail    = "email"
-	columnPassword = "password"
-	columnRole     = "role"
+	tableName       = "users"
+	idColumn        = "id"
+	columnName      = "name"
+	columnEmail     = "email"
+	columnPassword  = "password"
+	columnRole      = "role"
+	columnCreatedAt = "created_at"
+	columnUpdatedAt = "updated_at"
 )
 
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)

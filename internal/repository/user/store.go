@@ -2,16 +2,25 @@ package user
 
 import (
 	db "auth/internal/client/db"
-	model "auth/internal/repository/user/model"
+	"auth/internal/model"
+
+	//modelRepo "auth/internal/repository/model"
 	"context"
 	"log"
+
+	"github.com/sppps/pwdhash"
 )
 
-func (r *UserRepository) Store(ctx context.Context, user model.User) (int64, error) {
+func (r *UserRepository) Store(ctx context.Context, user model.UserCreate) (int64, error) {
+
+	hash, err := pwdhash.Hash(user.Password)
+	if err != nil {
+		return 0, err
+	}
 
 	sqlStr, arg, err := psql.Insert(tableName).
 		Columns(columnName, columnEmail, columnPassword, columnRole).
-		Values(user.Name, user.Email, user.Password, user.Roles).
+		Values(user.Name, user.Email, hash, user.Roles).
 		Suffix("RETURNING ID").
 		ToSql()
 

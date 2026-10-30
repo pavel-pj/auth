@@ -10,10 +10,11 @@ import (
 func (s *Implementation) Store(ctx context.Context, req *desc.StoreRequest) (*desc.StoreResponse, error) {
 
 	if req.GetUser().Password != req.GetUser().PasswordConfirm {
-		return &desc.StoreResponse{}, errors.New("passwords and password confirmation doesnot equal")
+		return &desc.StoreResponse{}, errors.New("passwords and password confirmation are not equal")
 	}
 
-	user := converter.ToUserFromProto(req.GetUser())
+	user := converter.ToUserCreateFromProto(req.GetUser())
+
 	result, err := s.serv.Store(ctx, user)
 	if err != nil {
 		return &desc.StoreResponse{}, err

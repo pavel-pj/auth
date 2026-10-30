@@ -5,31 +5,16 @@ import (
 	"fmt"
 
 	model "auth/internal/model"
-	converter "auth/internal/repository/user/converter"
-
-	"github.com/sppps/pwdhash"
 )
 
-func (s UserService) Store(ctx context.Context, user model.User) (int64, error) {
+func (s UserService) Store(ctx context.Context, user model.UserCreate) (int64, error) {
 
 	var id int64
 
 	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
 
-		hash, errTx := pwdhash.Hash(user.Password)
-		if errTx != nil {
-			//log.Fatal(errTx)
-			return errTx
-		}
-
-		hashedUser := model.User{
-			Name:     user.Name,
-			Email:    user.Email,
-			Password: hash,
-			Roles:    user.Roles,
-		}
-
-		id, errTx = s.Repository.Store(ctx, converter.ToRepoUserFromService(hashedUser))
+		var errTx error
+		id, errTx = s.Repository.Store(ctx, user)
 		if errTx != nil {
 			return errTx
 		}

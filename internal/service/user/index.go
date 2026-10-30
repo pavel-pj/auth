@@ -2,7 +2,6 @@ package user
 
 import (
 	"auth/internal/model"
-	converter "auth/internal/repository/user/converter"
 	"context"
 )
 
@@ -21,15 +20,9 @@ func (s UserService) Index(ctx context.Context, limit, offset uint64) ([]model.U
 		limit = maxLimit
 	}
 
-	data, err := s.Repository.Index(ctx, limit, offset)
+	users, err := s.Repository.Index(ctx, limit, offset)
 	if err != nil {
 		return []model.User{}, err
-	}
-
-	var users []model.User
-
-	for _, u := range data {
-		users = append(users, converter.ToServiceFromRepoUser(u))
 	}
 
 	return users, nil

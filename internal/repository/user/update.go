@@ -1,10 +1,11 @@
 package user
 
 import (
-	model "auth/internal/repository/user/model"
+	"auth/internal/model"
 	"context"
 )
 
-func (r *UserRepository) Update(ctx context.Context, id int64) (model.User, error) {
+func (r *UserRepository) Update(ctx context.Context, user model.UserPatch) (model.User, error) {
 	return model.User{}, nil
+
 }
