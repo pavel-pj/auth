@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>user: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">auth/internal/api/user/delete.go (0.0%)</option>
+				
+				<option value="file1">auth/internal/api/user/get.go (0.0%)</option>
+				
+				<option value="file2">auth/internal/api/user/index.go (0.0%)</option>
+				
+				<option value="file3">auth/internal/api/user/service.go (100.0%)</option>
+				
+				<option value="file4">auth/internal/api/user/store.go (85.7%)</option>
+				
+				<option value="file5">auth/internal/api/user/update.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package user
+
+import (
+        desc "auth/pkg/user_v1"
+        "context"
+)
+
+func (s *Implementation) Delete(ctx context.Context, req *desc.DeleteRequest) (*desc.DeleteResponse, error) {
+
+        <span class="cov0" title="0">id := req.GetId()
+        err := s.serv.Delete(ctx, id)
+        if err != nil </span>{
+                <span class="cov0" title="0">return &amp;desc.DeleteResponse{}, err
+</span>        }
+
+        <span class="cov0" title="0">return &amp;desc.DeleteResponse{}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package user
+
+import (
+        converter "auth/internal/converter/user"
+        desc "auth/pkg/user_v1"
+        "context"
+)
+
+func (s *Implementation) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetResponse, error) {
+
+        <span class="cov0" title="0">id := req.GetId()
+        result, err := s.serv.Get(ctx, id)
+        if err != nil </span>{
+                <span class="cov0" title="0">return &amp;desc.GetResponse{}, err
+</span>        }
+
+        <span class="cov0" title="0">return &amp;desc.GetResponse{User: converter.ToProtoUserFromService(result)}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package user
+
+import (
+        converter "auth/internal/converter/user"
+        desc "auth/pkg/user_v1"
+        "context"
+)
+
+func (s *Implementation) Index(ctx context.Context, req *desc.IndexRequest) (*desc.IndexResponse, error) {
+
+        <span class="cov0" title="0">limit := req.GetLimit()
+        offset := req.GetOffset()
+        data, err := s.serv.Index(ctx, limit, offset)
+        if err != nil </span>{
+                <span class="cov0" title="0">return &amp;desc.IndexResponse{}, err
+</span>        }
+
+        <span class="cov0" title="0">var users []*desc.User
+</span>
+        <span class="cov0" title="0">for _, u := range data </span>{
+                <span class="cov0" title="0">users = append(users, converter.ToProtoUserFromService(u))
+</span>        }
+
+        <span class="cov0" title="0">return &amp;desc.IndexResponse{User: users}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package user
+
+import (
+        "auth/internal/service"
+        desc "auth/pkg/user_v1"
+        "errors"
+)
+
+var (
+        ErrorPasswwordConfirmation = errors.New("passwords and password confirmation are not equal")
+)
+
+type Implementation struct {
+        desc.UnimplementedUserV1Server
+        serv service.UserService
+}
+
+func NewUserImplimentation(userService service.UserService) *Implementation {
+        <span class="cov8" title="1">return &amp;Implementation{
+                serv: userService,
+</span>        }
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package user
+
+import (
+        converter "auth/internal/converter/user"
+        desc "auth/pkg/user_v1"
+        "context"
+)
+
+func (s *Implementation) Store(ctx context.Context, req *desc.StoreRequest) (*desc.StoreResponse, error) {
+
+        <span class="cov8" title="1">if req.GetUser().Password != req.GetUser().PasswordConfirm </span>{
+                <span class="cov0" title="0">return &amp;desc.StoreResponse{}, ErrorPasswwordConfirmation
+</span>        }
+
+        <span class="cov8" title="1">user := converter.ToUserCreateFromProto(req.GetUser())
+</span>
+        <span class="cov8" title="1">result, err := s.serv.Store(ctx, user)
+        if err != nil </span>{
+                <span class="cov8" title="1">return &amp;desc.StoreResponse{}, err
+</span>        }
+
+        <span class="cov8" title="1">return &amp;desc.StoreResponse{Id: result}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package user
+
+import (
+        converter "auth/internal/converter/user"
+        desc "auth/pkg/user_v1"
+        "context"
+)
+
+func (s *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*desc.UpdateResponse, error) {
+
+        <span class="cov0" title="0">data := converter.ToUserPatchFromProto(req)
+        updated, err := s.serv.Update(ctx, data)
+        if err != nil </span>{
+                <span class="cov0" title="0">return &amp;desc.UpdateResponse{}, err
+</span>        }
+
+        <span class="cov0" title="0">return &amp;desc.UpdateResponse{User: converter.ToProtoUserFromService(updated)}, nil</span>
+
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

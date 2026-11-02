@@ -5,15 +5,16 @@ import (
 	"auth/internal/model"
 	"auth/internal/service"
 	desc "auth/pkg/user_v1"
-	"context"
 	"fmt"
+
+	"context"
 	"testing"
 
 	serviceMocks "auth/internal/service/mocks"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/gojuno/minimock/v3"
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreate(t *testing.T) {
@@ -32,8 +33,9 @@ func TestCreate(t *testing.T) {
 		id       = gofakeit.Int64()
 		name     = gofakeit.Name()
 		email    = gofakeit.Email()
-		password = gofakeit.Password(true, true, true, true, false, 16)
-		role     = "ADMIN"
+		password = "Password04%"
+		//passwordFail = "Password04_"
+		role = "ADMIN"
 
 		serviceErr = fmt.Errorf("service error")
 
@@ -60,6 +62,22 @@ func TestCreate(t *testing.T) {
 		res = &desc.StoreResponse{
 			Id: id,
 		}
+
+		//===============================================
+		/*
+			reqFailConfirmPassword = &desc.StoreRequest{
+				User: &desc.UserCreate{
+
+					Info: &desc.UserData{
+						Name:  name,
+						Email: email,
+						Roles: 1,
+					},
+					Password:        password,
+					PasswordConfirm: passwordFail,
+				},
+			}
+		*/
 	)
 
 	tests := []struct {
@@ -98,6 +116,21 @@ func TestCreate(t *testing.T) {
 				return mock
 			},
 		},
+		/*
+			{
+				name: "error confirmation password",
+				args: args{
+					ctx: ctx,
+					req: reqFailConfirmPassword,
+				},
+				want: &desc.StoreResponse{},
+				err:  api.ErrorPasswwordConfirmation,
+				userServiceMock: func(mc *minimock.Controller) service.UserService {
+
+					return serviceMocks.NewUserServiceMock(mc)
+				},
+			},
+		*/
 	}
 
 	for _, tt := range tests {
@@ -107,8 +140,8 @@ func TestCreate(t *testing.T) {
 			//userServiceMock := tt.userServiceMock
 			api := user.NewUserImplimentation(tt.userServiceMock(mc))
 			res, err := api.Store(tt.args.ctx, tt.args.req)
-			require.Equal(t, tt.err, err)
-			require.Equal(t, tt.want.Id, res.Id)
+			assert.Equal(t, tt.err, err)
+			assert.Equal(t, tt.want.Id, res.Id)
 
 		})
 

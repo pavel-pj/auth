@@ -4,13 +4,12 @@ import (
 	converter "auth/internal/converter/user"
 	desc "auth/pkg/user_v1"
 	"context"
-	"errors"
 )
 
 func (s *Implementation) Store(ctx context.Context, req *desc.StoreRequest) (*desc.StoreResponse, error) {
 
 	if req.GetUser().Password != req.GetUser().PasswordConfirm {
-		return &desc.StoreResponse{}, errors.New("passwords and password confirmation are not equal")
+		return &desc.StoreResponse{}, ErrorPasswwordConfirmation
 	}
 
 	user := converter.ToUserCreateFromProto(req.GetUser())

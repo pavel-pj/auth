@@ -40,4 +40,11 @@ goose-create:
 
 lint:
 	$(LOCAL_BIN)/golangci-lint run ./...
+
+
+tests-cover:
+	go test -count=1 -coverpkg=auth/internal/api/user -coverprofile=coverage.out ./internal/api/user/tests
+	go tool cover -func=coverage.out 
+	go tool cover -html=coverage.out -o coverage.html
+	
  
