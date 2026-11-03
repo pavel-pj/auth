@@ -21,5 +21,5 @@ func (s *Implementation) Index(ctx context.Context, req *desc.IndexRequest) (*de
 		users = append(users, converter.ToProtoUserFromService(u))
 	}
 
-	return &desc.IndexResponse{User: users}, nil
+	return &desc.IndexResponse{Users: users}, nil
 }

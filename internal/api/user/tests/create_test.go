@@ -1,9 +1,10 @@
 package tests
 
 import (
-	"auth/internal/api/user"
+	userApi "auth/internal/api/user"
 	"auth/internal/model"
 	"auth/internal/service"
+
 	desc "auth/pkg/user_v1"
 	"fmt"
 
@@ -30,12 +31,12 @@ func TestCreate(t *testing.T) {
 		ctx = context.Background()
 		mc  = minimock.NewController(t)
 
-		id       = gofakeit.Int64()
-		name     = gofakeit.Name()
-		email    = gofakeit.Email()
-		password = "Password04%"
-		//passwordFail = "Password04_"
-		role = "ADMIN"
+		id           = gofakeit.Int64()
+		name         = gofakeit.Name()
+		email        = gofakeit.Email()
+		password     = "Password04%"
+		passwordFail = "Password04_"
+		role         = "ADMIN"
 
 		serviceErr = fmt.Errorf("service error")
 
@@ -64,20 +65,19 @@ func TestCreate(t *testing.T) {
 		}
 
 		//===============================================
-		/*
-			reqFailConfirmPassword = &desc.StoreRequest{
-				User: &desc.UserCreate{
 
-					Info: &desc.UserData{
-						Name:  name,
-						Email: email,
-						Roles: 1,
-					},
-					Password:        password,
-					PasswordConfirm: passwordFail,
+		reqFailConfirmPassword = &desc.StoreRequest{
+			User: &desc.UserCreate{
+
+				Info: &desc.UserData{
+					Name:  name,
+					Email: email,
+					Roles: 1,
 				},
-			}
-		*/
+				Password:        password,
+				PasswordConfirm: passwordFail,
+			},
+		}
 	)
 
 	tests := []struct {
@@ -116,35 +116,48 @@ func TestCreate(t *testing.T) {
 				return mock
 			},
 		},
-		/*
-			{
-				name: "error confirmation password",
-				args: args{
-					ctx: ctx,
-					req: reqFailConfirmPassword,
-				},
-				want: &desc.StoreResponse{},
-				err:  api.ErrorPasswwordConfirmation,
-				userServiceMock: func(mc *minimock.Controller) service.UserService {
 
-					return serviceMocks.NewUserServiceMock(mc)
-				},
+		{
+			name: "error confirmation password",
+			args: args{
+				ctx: ctx,
+				req: reqFailConfirmPassword,
 			},
-		*/
+			want: &desc.StoreResponse{},
+			err:  userApi.ErrorPasswwordConfirmation,
+			userServiceMock: func(mc *minimock.Controller) service.UserService {
+
+				return serviceMocks.NewUserServiceMock(mc)
+
+			},
+		},
 	}
 
 	for _, tt := range tests {
 
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			//userServiceMock := tt.userServiceMock
-			api := user.NewUserImplimentation(tt.userServiceMock(mc))
+			api := userApi.NewUserImplimentation(tt.userServiceMock(mc))
 			res, err := api.Store(tt.args.ctx, tt.args.req)
-			assert.Equal(t, tt.err, err)
 			assert.Equal(t, tt.want.Id, res.Id)
-
+			assert.Equal(t, tt.err, err)
 		})
 
 	}
+
+	/*
+		for _, tt := range tests {
+
+			//tt := tt
+			t.Run(tt.name, func(t *testing.T) {
+				//userServiceMock := tt.userServiceMock
+				api := userApi.NewUserImplimentation(tt.userServiceMock(mc))
+				res, err := api.Store(tt.args.ctx, tt.args.req)
+				assert.Equal(t, tt.err, err)
+				assert.Equal(t, tt.want.Id, res.Id)
+
+			})
+
+		}
+	*/
 
 }
