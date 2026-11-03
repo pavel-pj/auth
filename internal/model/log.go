@@ -11,6 +11,7 @@ const (
 	LevelError Level = "error"
 )
 
+// ff
 type Log struct {
 	ID        int64
 	CreatedAt time.Time
