@@ -1,60 +1,19 @@
 package app
 
-/*
 import (
-	apiUserInt "auth/internal/api/user"
-	configInt "auth/internal/config"
-	repoUserInt "auth/internal/repository/user"
-	servUserInt "auth/internal/service/user"
-	"log"
-
-	config "auth/internal/config/env"
-
-	"github.com/jackc/pgx/v5/pgxpool"
-)
-
-type ServiceProvider struct {
-	GrpcConfig configInt.GRPCConfig
-	PgConfig   configInt.PGConfig
-
-	PgPool *pgxpool.Pool
-
-	ServiceUser servUserInt.UserService
-	RepoUser    repoUserInt.UserRepository
-	ApiUser     *apiUserInt.Implementation
-}
-
-func NewServiceProvider() *ServiceProvider {
-	return &ServiceProvider{}
-}
-
-func (s *ServiceProvider) GetGRPCConfig() configInt.GRPCConfig {
-	if s.GrpcConfig == nil {
-		conf, err := config.NewGRPCConfig()
-		if err != nil {
-			log.Fatalf("Could not get config. Error: %s", err.Error())
-		}
-
-		s.GrpcConfig = conf
-
-	}
-
-	return s.GrpcConfig
-}
-*/
-
-import (
-	"auth/internal/closer"
+	//"auth/internal/closer"
 	"auth/internal/config"
 	"context"
 	"log"
 
 	grpcApi "auth/internal/api/user"
 	implSerivce "auth/internal/api/user"
-	db "auth/internal/client/db"
-	pg "auth/internal/client/db/pg"
-	"auth/internal/client/db/transaction"
-	_ "auth/internal/closer"
+
+	//db "auth/internal/client/db"
+	//pg "auth/internal/client/db/pg"
+	db "github.com/pavel-pj/platform_lib/pkg/client/db"
+	pg "github.com/pavel-pj/platform_lib/pkg/client/db/pg"
+
 	env "auth/internal/config/env"
 	repository "auth/internal/repository"
 	logRepo "auth/internal/repository/log"
@@ -62,6 +21,9 @@ import (
 	service "auth/internal/service"
 	logServ "auth/internal/service/log"
 	userServ "auth/internal/service/user"
+
+	"github.com/pavel-pj/platform_lib/pkg/client/db/transaction"
+	"github.com/pavel-pj/platform_lib/pkg/closer"
 )
 
 type serviceProvider struct {

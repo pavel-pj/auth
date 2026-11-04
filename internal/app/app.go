@@ -1,25 +1,17 @@
 package app
 
 import (
+	env "auth/internal/config/env"
+	desc "auth/pkg/user_v1"
 	"context"
 	"log"
 	"net"
 
-	//"chat-server/internal/db/generated"
-	//"chat-server/internal/services"
-
-	//epository "auth/internal/grpc_server/repository"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pavel-pj/platform_lib/pkg/closer"
 	"google.golang.org/grpc"
-
-	env "auth/internal/config/env"
-
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
-
-	"auth/internal/closer"
-	desc "auth/pkg/user_v1"
-
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 // App хранит ВСЕ зависимости приложения

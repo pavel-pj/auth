@@ -1,9 +1,10 @@
 package user
 
 import (
-	"auth/internal/client/db"
 	repo "auth/internal/repository"
 	serv "auth/internal/service"
+
+	"github.com/pavel-pj/platform_lib/pkg/client/db"
 )
 
 type UserService struct {

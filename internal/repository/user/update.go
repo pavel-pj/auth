@@ -1,12 +1,13 @@
 package user
 
 import (
-	"auth/internal/client/db"
 	"auth/internal/model"
 	"auth/internal/repository/user/converter"
 	modelRepo "auth/internal/repository/user/model"
 	"context"
 	"time"
+
+	"github.com/pavel-pj/platform_lib/pkg/client/db"
 
 	sq "github.com/Masterminds/squirrel"
 )

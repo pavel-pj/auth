@@ -1,10 +1,11 @@
 package user
 
 import (
-	db "auth/internal/client/db"
 	repo "auth/internal/repository"
 	"errors"
 	"fmt"
+
+	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgconn"

@@ -1,12 +1,13 @@
 package user
 
 import (
-	db "auth/internal/client/db"
 	"auth/internal/model"
 	"auth/internal/repository/user/converter"
 	modelRepo "auth/internal/repository/user/model"
 	"context"
 	"log"
+
+	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 )
 
 func (r *UserRepository) Index(ctx context.Context, limit, offset uint64) ([]model.User, error) {

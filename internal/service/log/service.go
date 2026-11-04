@@ -1,9 +1,10 @@
 package log
 
 import (
-	db "auth/internal/client/db"
 	repo "auth/internal/repository"
 	serv "auth/internal/service"
+
+	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 )
 
 type LogService struct {

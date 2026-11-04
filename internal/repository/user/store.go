@@ -1,8 +1,9 @@
 package user
 
 import (
-	db "auth/internal/client/db"
 	"auth/internal/model"
+
+	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 
 	//modelRepo "auth/internal/repository/model"
 	"context"

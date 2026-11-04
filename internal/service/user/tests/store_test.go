@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"auth/internal/client/db"
 	dbMocks "auth/internal/client/db/mocks"
 	"auth/internal/model"
 	"auth/internal/repository"
@@ -9,6 +8,8 @@ import (
 	"auth/internal/service"
 	serviceMocks "auth/internal/service/mocks"
 	"errors"
+
+	"github.com/pavel-pj/platform_lib/pkg/client/db"
 
 	userService "auth/internal/service/user"
 	"context"

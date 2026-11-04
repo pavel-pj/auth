@@ -1,8 +1,9 @@
 package user
 
 import (
-	db "auth/internal/client/db"
 	"context"
+
+	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 
 	sq "github.com/Masterminds/squirrel"
 )

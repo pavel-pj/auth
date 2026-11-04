@@ -1,11 +1,12 @@
 package repository
 
 import (
-	"auth/internal/client/db"
 	repo "auth/internal/repository"
 	model "auth/internal/repository/log/model"
 	"context"
 	"time"
+
+	"github.com/pavel-pj/platform_lib/pkg/client/db"
 
 	sq "github.com/Masterminds/squirrel"
 )
