@@ -2,16 +2,16 @@
 
 package mocks
 
-//go:generate minimock -i auth/internal/client/db.TxManager -o tx_manager_minimock.go -n TxManagerMock -p mocks
+//go:generate minimock -i github.com/pavel-pj/platform_lib/pkg/client/db.TxManager -o tx_manager_minimock.go -n TxManagerMock -p mocks
 
 import (
-	mm_db "auth/internal/client/db"
 	"context"
 	"sync"
 	mm_atomic "sync/atomic"
 	mm_time "time"
 
 	"github.com/gojuno/minimock/v3"
+	mm_db "github.com/pavel-pj/platform_lib/pkg/client/db"
 )
 
 // TxManagerMock implements mm_db.TxManager

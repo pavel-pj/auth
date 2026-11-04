@@ -316,9 +316,10 @@ func (s UserService) Index(ctx context.Context, limit, offset uint64) ([]model.U
 		<pre class="file" id="file9" style="display: none">package user
 
 import (
-        "auth/internal/client/db"
         repo "auth/internal/repository"
         serv "auth/internal/service"
+
+        "github.com/pavel-pj/platform_lib/pkg/client/db"
 )
 
 type UserService struct {

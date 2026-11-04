@@ -1,7 +1,7 @@
 package tests
 
 import (
-	dbMocks "auth/internal/client/db/mocks"
+	dbMocks "auth/internal/client/mocks"
 	"auth/internal/model"
 	"auth/internal/repository"
 	repositoryMocks "auth/internal/repository/mocks"

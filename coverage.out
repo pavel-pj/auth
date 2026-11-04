@@ -18,7 +18,7 @@ auth/internal/service/user/index.go:20.3,21.1 1 0
 auth/internal/service/user/index.go:23.2,24.16 2 0
 auth/internal/service/user/index.go:25.3,26.1 1 0
 auth/internal/service/user/index.go:28.2,28.19 1 0
-auth/internal/service/user/service.go:20.2,24.1 1 1
+auth/internal/service/user/service.go:21.2,25.1 1 1
 auth/internal/service/user/store.go:12.2,13.1 1 1
 auth/internal/service/user/store.go:14.2,14.72 1 1
 auth/internal/service/user/store.go:16.3,18.19 3 1
