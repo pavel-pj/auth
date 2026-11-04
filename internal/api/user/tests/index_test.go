@@ -19,7 +19,7 @@ import (
 )
 
 func TestIndex(t *testing.T) {
-
+	t.Parallel()
 	type userServiceMockFunc func(mc *minimock.Controller) service.UserService
 
 	type args struct {
@@ -110,9 +110,9 @@ func TestIndex(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-
+			t.Parallel()
 			api := userApi.NewUserImplimentation(tt.userServiceMock(mc))
 			resp, err := api.Index(tt.args.ctx, &tt.args.req)
 			assert.Equal(t, tt.err, err)

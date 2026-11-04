@@ -19,6 +19,8 @@ import (
 
 func TestGet(t *testing.T) {
 
+	t.Parallel()
+
 	type userServiceMockFunc func(mc *minimock.Controller) service.UserService
 
 	type args struct {
@@ -103,8 +105,10 @@ func TestGet(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+
+			t.Parallel()
 
 			api := userApi.NewUserImplimentation(tt.userServiceMock(mc))
 			resp, err := api.Get(tt.args.ctx, &tt.args.req)
