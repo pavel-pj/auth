@@ -168,7 +168,10 @@ func (s *serviceProvider) GetLogRepository(ctx context.Context) repository.LogRe
 
 func (s *serviceProvider) GetUserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
-		s.userService = userServ.NewUserService(s.GetUserRepository(ctx), s.GetTxManager(ctx), s.GetLogService(ctx))
+		s.userService = userServ.NewUserService(
+			s.GetUserRepository(ctx),
+			s.GetTxManager(ctx),
+			s.GetLogService(ctx))
 	}
 	return s.userService
 }

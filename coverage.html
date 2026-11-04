@@ -55,17 +55,17 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">auth/internal/api/user/delete.go (0.0%)</option>
+				<option value="file0">auth/internal/service/user/delete.go (0.0%)</option>
 				
-				<option value="file1">auth/internal/api/user/get.go (100.0%)</option>
+				<option value="file1">auth/internal/service/user/get.go (0.0%)</option>
 				
-				<option value="file2">auth/internal/api/user/index.go (100.0%)</option>
+				<option value="file2">auth/internal/service/user/index.go (0.0%)</option>
 				
-				<option value="file3">auth/internal/api/user/service.go (100.0%)</option>
+				<option value="file3">auth/internal/service/user/service.go (100.0%)</option>
 				
-				<option value="file4">auth/internal/api/user/store.go (100.0%)</option>
+				<option value="file4">auth/internal/service/user/store.go (100.0%)</option>
 				
-				<option value="file5">auth/internal/api/user/update.go (0.0%)</option>
+				<option value="file5">auth/internal/service/user/update.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -82,89 +82,112 @@
 		<pre class="file" id="file0" style="display: none">package user
 
 import (
-        desc "auth/pkg/user_v1"
+        "auth/internal/model"
         "context"
+        "fmt"
 )
 
-func (s *Implementation) Delete(ctx context.Context, req *desc.DeleteRequest) (*desc.DeleteResponse, error) {
+func (s UserService) Delete(ctx context.Context, id int64) error {
 
-        <span class="cov0" title="0">id := req.GetId()
-        err := s.serv.Delete(ctx, id)
-        if err != nil </span>{
-                <span class="cov0" title="0">return &amp;desc.DeleteResponse{}, err
+        <span class="cov0" title="0">err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error </span>{
+                <span class="cov0" title="0">_, err := s.Repository.Delete(ctx, id)
+                if err != nil </span>{
+                        <span class="cov0" title="0">return err
+</span>                }
+
+                <span class="cov0" title="0">errLog := s.logService.Store(ctx, model.Log{
+                        Level:   model.LevelInfo,
+                        Message: fmt.Sprintf("user_delete.id:%d", id),
+                })
+                if errLog != nil </span>{
+                        <span class="cov0" title="0">return errLog
+</span>                }
+
+                <span class="cov0" title="0">return nil</span>
+
+        })
+        <span class="cov0" title="0">if err != nil </span>{
+                <span class="cov0" title="0">return err
 </span>        }
 
-        <span class="cov0" title="0">return &amp;desc.DeleteResponse{}, nil</span>
+        <span class="cov0" title="0">return nil</span>
 }
 </pre>
 		
 		<pre class="file" id="file1" style="display: none">package user
 
 import (
-        converter "auth/internal/converter/user"
-        desc "auth/pkg/user_v1"
+        "auth/internal/model"
         "context"
 )
 
-func (s *Implementation) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetResponse, error) {
+func (s UserService) Get(ctx context.Context, id int64) (model.User, error) {
 
-        <span class="cov8" title="1">id := req.GetId()
-        result, err := s.serv.Get(ctx, id)
+        <span class="cov0" title="0">data, err := s.Repository.Get(ctx, id)
         if err != nil </span>{
-                <span class="cov8" title="1">return &amp;desc.GetResponse{}, err
+                <span class="cov0" title="0">return model.User{}, err
 </span>        }
 
-        <span class="cov8" title="1">return &amp;desc.GetResponse{User: converter.ToProtoUserFromService(result)}, nil</span>
+        <span class="cov0" title="0">return data, nil</span>
+
 }
 </pre>
 		
 		<pre class="file" id="file2" style="display: none">package user
 
 import (
-        converter "auth/internal/converter/user"
-        desc "auth/pkg/user_v1"
+        "auth/internal/model"
         "context"
 )
 
-func (s *Implementation) Index(ctx context.Context, req *desc.IndexRequest) (*desc.IndexResponse, error) {
+const (
+        defaultLimit = 10
+        maxLimit     = 100
+        maxOffset    = 10_000
+)
 
-        <span class="cov8" title="1">limit := req.GetLimit()
-        offset := req.GetOffset()
-        data, err := s.serv.Index(ctx, limit, offset)
+func (s UserService) Index(ctx context.Context, limit, offset uint64) ([]model.User, error) {
+
+        <span class="cov0" title="0">if limit == 0 </span>{
+                <span class="cov0" title="0">limit = defaultLimit
+</span>        }
+        <span class="cov0" title="0">if limit &gt; maxLimit </span>{
+                <span class="cov0" title="0">limit = maxLimit
+</span>        }
+
+        <span class="cov0" title="0">users, err := s.Repository.Index(ctx, limit, offset)
         if err != nil </span>{
-                <span class="cov8" title="1">return &amp;desc.IndexResponse{}, err
+                <span class="cov0" title="0">return []model.User{}, err
 </span>        }
 
-        <span class="cov8" title="1">var users []*desc.User
-</span>
-        <span class="cov8" title="1">for _, u := range data </span>{
-                <span class="cov8" title="1">users = append(users, converter.ToProtoUserFromService(u))
-</span>        }
+        <span class="cov0" title="0">return users, nil</span>
 
-        <span class="cov8" title="1">return &amp;desc.IndexResponse{Users: users}, nil</span>
 }
 </pre>
 		
 		<pre class="file" id="file3" style="display: none">package user
 
 import (
-        "auth/internal/service"
-        desc "auth/pkg/user_v1"
-        "errors"
+        "auth/internal/client/db"
+        repo "auth/internal/repository"
+        serv "auth/internal/service"
 )
 
-var (
-        ErrorPasswwordConfirmation = errors.New("passwords and password confirmation are not equal")
-)
-
-type Implementation struct {
-        desc.UnimplementedUserV1Server
-        serv service.UserService
+type UserService struct {
+        Repository repo.UserRepository
+        txManager  db.TxManager
+        logService serv.LogService
 }
 
-func NewUserImplimentation(userService service.UserService) *Implementation {
-        <span class="cov8" title="1">return &amp;Implementation{
-                serv: userService,
+func NewUserService(
+        repository repo.UserRepository,
+        txManager db.TxManager,
+        logService serv.LogService,
+) serv.UserService {
+        <span class="cov8" title="1">return UserService{
+                Repository: repository,
+                txManager:  txManager,
+                logService: logService,
 </span>        }
 }
 </pre>
@@ -172,46 +195,99 @@ func NewUserImplimentation(userService service.UserService) *Implementation {
 		<pre class="file" id="file4" style="display: none">package user
 
 import (
-        converter "auth/internal/converter/user"
-        desc "auth/pkg/user_v1"
         "context"
+        "fmt"
+
+        model "auth/internal/model"
 )
 
-func (s *Implementation) Store(ctx context.Context, req *desc.StoreRequest) (*desc.StoreResponse, error) {
+func (s UserService) Store(ctx context.Context, user model.UserCreate) (int64, error) {
 
-        <span class="cov8" title="1">if req.GetUser().Password != req.GetUser().PasswordConfirm </span>{
-                <span class="cov8" title="1">return &amp;desc.StoreResponse{}, ErrorPasswwordConfirmation
-</span>        }
-
-        <span class="cov8" title="1">user := converter.ToUserCreateFromProto(req.GetUser())
+        <span class="cov8" title="1">var id int64
 </span>
-        <span class="cov8" title="1">result, err := s.serv.Store(ctx, user)
-        if err != nil </span>{
-                <span class="cov8" title="1">return &amp;desc.StoreResponse{}, err
+        <span class="cov8" title="1">err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error </span>{
+
+                <span class="cov8" title="1">var errTx error
+                id, errTx = s.Repository.Store(ctx, user)
+                if errTx != nil </span>{
+                        <span class="cov8" title="1">return errTx
+</span>                }
+
+                <span class="cov8" title="1">errTx = s.logService.Store(ctx, model.Log{
+                        Level:   model.LevelInfo,
+                        Message: fmt.Sprintf("user_store.name:%s,email:%s.role:%s", user.Name, user.Email, user.Roles),
+                })
+</span>
+                <span class="cov8" title="1">if errTx != nil </span>{
+                        <span class="cov8" title="1">return errTx
+</span>                }
+
+                <span class="cov8" title="1">return nil</span>
+
+        })
+
+        <span class="cov8" title="1">if err != nil </span>{
+                <span class="cov8" title="1">return 0, err
 </span>        }
 
-        <span class="cov8" title="1">return &amp;desc.StoreResponse{Id: result}, nil</span>
+        <span class="cov8" title="1">return id, nil</span>
+
 }
 </pre>
 		
 		<pre class="file" id="file5" style="display: none">package user
 
 import (
-        converter "auth/internal/converter/user"
-        desc "auth/pkg/user_v1"
+        "auth/internal/model"
+        "fmt"
+
         "context"
 )
 
-func (s *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*desc.UpdateResponse, error) {
+func (s UserService) Update(ctx context.Context, user model.UserPatch) (model.User, error) {
 
-        <span class="cov0" title="0">data := converter.ToUserPatchFromProto(req)
-        updated, err := s.serv.Update(ctx, data)
-        if err != nil </span>{
-                <span class="cov0" title="0">return &amp;desc.UpdateResponse{}, err
+        <span class="cov0" title="0">var updatedUser model.User
+</span>
+        <span class="cov0" title="0">err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error </span>{
+
+                <span class="cov0" title="0">var errTx error
+                updatedUser, errTx = s.Repository.Update(ctx, user)
+                if errTx != nil </span>{
+                        <span class="cov0" title="0">return errTx
+</span>                }
+
+                <span class="cov0" title="0">errTx = s.logService.Store(ctx, model.Log{
+                        Level:   "info",
+                        Message: fmt.Sprintf("user_update.%s", createUpdateLog(user)),
+                })
+                if errTx != nil </span>{
+                        <span class="cov0" title="0">return errTx
+</span>                }
+
+                <span class="cov0" title="0">return nil</span>
+        })
+
+        <span class="cov0" title="0">if err != nil </span>{
+                <span class="cov0" title="0">return model.User{}, err
 </span>        }
 
-        <span class="cov0" title="0">return &amp;desc.UpdateResponse{User: converter.ToProtoUserFromService(updated)}, nil</span>
+        <span class="cov0" title="0">return updatedUser, nil</span>
 
+}
+
+func createUpdateLog(user model.UserPatch) string {
+
+        <span class="cov0" title="0">var str string
+        if user.Name != nil </span>{
+                <span class="cov0" title="0">str = "name: " + *user.Name + ";"
+</span>        }
+        <span class="cov0" title="0">if user.Email != nil </span>{
+                <span class="cov0" title="0">str = str + "enail: " + *user.Email
+</span>        }
+        <span class="cov0" title="0">if user.Roles != nil </span>{
+                <span class="cov0" title="0">str = str + "roles: " + *user.Roles
+</span>        }
+        <span class="cov0" title="0">return str</span>
 }
 </pre>
 		
