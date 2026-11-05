@@ -69,7 +69,7 @@
 				
 				<option value="file6">auth/internal/service/user/delete.go (0.0%)</option>
 				
-				<option value="file7">auth/internal/service/user/get.go (0.0%)</option>
+				<option value="file7">auth/internal/service/user/get.go (100.0%)</option>
 				
 				<option value="file8">auth/internal/service/user/index.go (0.0%)</option>
 				
@@ -271,12 +271,12 @@ import (
 
 func (s UserService) Get(ctx context.Context, id int64) (model.User, error) {
 
-        <span class="cov0" title="0">data, err := s.Repository.Get(ctx, id)
+        <span class="cov8" title="1">data, err := s.Repository.Get(ctx, id)
         if err != nil </span>{
-                <span class="cov0" title="0">return model.User{}, err
+                <span class="cov8" title="1">return model.User{}, err
 </span>        }
 
-        <span class="cov0" title="0">return data, nil</span>
+        <span class="cov8" title="1">return data, nil</span>
 
 }
 </pre>
