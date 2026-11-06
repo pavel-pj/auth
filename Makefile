@@ -11,6 +11,7 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.14.0
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.33.0
+	GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate@v1.3.3
 
 
 
@@ -18,7 +19,7 @@ generate: generate-user-api
 
 generate-user-api:
 	mkdir -p pkg/user_v1
-	protoc --proto_path api/user_v1 \
+	protoc --proto_path api/user_v1  --proto_path vendor.protogen \
 	--proto_path vendor.protogen \
 	--go_out=pkg/user_v1 --go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \

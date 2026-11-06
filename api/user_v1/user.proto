@@ -5,8 +5,8 @@ package user_v1;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
-//import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 option go_package = "auth/pkg/user_v1;user_v1";
 
@@ -52,8 +52,8 @@ message UserCreate {
 }
 
 message UserData {
-    string name = 1  ;
-    string email  = 2;
+    string name = 1 [(validate.rules).string = {min_len:1, max_len:7}] ;
+    string email  = 2 [(validate.rules).string  = {email:true, max_len:70}];
     Roles roles = 3;
 }
 
