@@ -22,9 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserV1Client interface {
-	Index(ctx context.Context, in *IndexRequest, opts ...grpc.CallOption) (*IndexResponse, error)
-	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error)
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	Index(ctx context.Context, in *IndexRequest, opts ...grpc.CallOption) (*IndexResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 }
@@ -37,9 +37,9 @@ func NewUserV1Client(cc grpc.ClientConnInterface) UserV1Client {
 	return &userV1Client{cc}
 }
 
-func (c *userV1Client) Index(ctx context.Context, in *IndexRequest, opts ...grpc.CallOption) (*IndexResponse, error) {
-	out := new(IndexResponse)
-	err := c.cc.Invoke(ctx, "/user_v1.UserV1/Index", in, out, opts...)
+func (c *userV1Client) Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error) {
+	out := new(StoreResponse)
+	err := c.cc.Invoke(ctx, "/user_v1.UserV1/Store", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -55,9 +55,9 @@ func (c *userV1Client) Get(ctx context.Context, in *GetRequest, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *userV1Client) Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error) {
-	out := new(StoreResponse)
-	err := c.cc.Invoke(ctx, "/user_v1.UserV1/Store", in, out, opts...)
+func (c *userV1Client) Index(ctx context.Context, in *IndexRequest, opts ...grpc.CallOption) (*IndexResponse, error) {
+	out := new(IndexResponse)
+	err := c.cc.Invoke(ctx, "/user_v1.UserV1/Index", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,9 +86,9 @@ func (c *userV1Client) Delete(ctx context.Context, in *DeleteRequest, opts ...gr
 // All implementations must embed UnimplementedUserV1Server
 // for forward compatibility
 type UserV1Server interface {
-	Index(context.Context, *IndexRequest) (*IndexResponse, error)
-	Get(context.Context, *GetRequest) (*GetResponse, error)
 	Store(context.Context, *StoreRequest) (*StoreResponse, error)
+	Get(context.Context, *GetRequest) (*GetResponse, error)
+	Index(context.Context, *IndexRequest) (*IndexResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	mustEmbedUnimplementedUserV1Server()
@@ -98,14 +98,14 @@ type UserV1Server interface {
 type UnimplementedUserV1Server struct {
 }
 
-func (UnimplementedUserV1Server) Index(context.Context, *IndexRequest) (*IndexResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Index not implemented")
+func (UnimplementedUserV1Server) Store(context.Context, *StoreRequest) (*StoreResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Store not implemented")
 }
 func (UnimplementedUserV1Server) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedUserV1Server) Store(context.Context, *StoreRequest) (*StoreResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Store not implemented")
+func (UnimplementedUserV1Server) Index(context.Context, *IndexRequest) (*IndexResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Index not implemented")
 }
 func (UnimplementedUserV1Server) Update(context.Context, *UpdateRequest) (*UpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
@@ -126,20 +126,20 @@ func RegisterUserV1Server(s grpc.ServiceRegistrar, srv UserV1Server) {
 	s.RegisterService(&UserV1_ServiceDesc, srv)
 }
 
-func _UserV1_Index_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IndexRequest)
+func _UserV1_Store_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StoreRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserV1Server).Index(ctx, in)
+		return srv.(UserV1Server).Store(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user_v1.UserV1/Index",
+		FullMethod: "/user_v1.UserV1/Store",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserV1Server).Index(ctx, req.(*IndexRequest))
+		return srv.(UserV1Server).Store(ctx, req.(*StoreRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -162,20 +162,20 @@ func _UserV1_Get_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserV1_Store_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StoreRequest)
+func _UserV1_Index_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IndexRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserV1Server).Store(ctx, in)
+		return srv.(UserV1Server).Index(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user_v1.UserV1/Store",
+		FullMethod: "/user_v1.UserV1/Index",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserV1Server).Store(ctx, req.(*StoreRequest))
+		return srv.(UserV1Server).Index(ctx, req.(*IndexRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -224,16 +224,16 @@ var UserV1_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserV1Server)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Index",
-			Handler:    _UserV1_Index_Handler,
+			MethodName: "Store",
+			Handler:    _UserV1_Store_Handler,
 		},
 		{
 			MethodName: "Get",
 			Handler:    _UserV1_Get_Handler,
 		},
 		{
-			MethodName: "Store",
-			Handler:    _UserV1_Store_Handler,
+			MethodName: "Index",
+			Handler:    _UserV1_Index_Handler,
 		},
 		{
 			MethodName: "Update",

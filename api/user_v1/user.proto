@@ -6,15 +6,36 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 //import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
 
 option go_package = "auth/pkg/user_v1;user_v1";
 
+
+
+
 service UserV1 {
-    rpc Index(IndexRequest) returns (IndexResponse);
-    rpc Get(GetRequest) returns (GetResponse);
-    rpc Store(StoreRequest) returns (StoreResponse);
-    rpc Update(UpdateRequest) returns (UpdateResponse);
-    rpc Delete(DeleteRequest) returns (DeleteResponse);
+    rpc Store(StoreRequest) returns (StoreResponse) {
+        option (google.api.http) = {
+            post: "/user/v1/create"
+            body: "*"
+        };
+    }
+  
+    rpc Get(GetRequest) returns (GetResponse) {
+        option (google.api.http) = { get: "/user/v1/{id}" };
+    }
+    rpc Index(IndexRequest) returns (IndexResponse){
+        option (google.api.http) = {   get :"/user/v1/list" };
+    }
+    rpc Update(UpdateRequest) returns (UpdateResponse) {
+        option (google.api.http) = {
+            patch: "/user/v1/{id}"
+            body: "*"
+        };
+    }
+    rpc Delete(DeleteRequest) returns (DeleteResponse){
+        option (google.api.http) = { delete: "/user/v1/{id}" };
+    }
   }
 
   enum Roles {

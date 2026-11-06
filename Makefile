@@ -19,12 +19,13 @@ generate: generate-user-api
 generate-user-api:
 	mkdir -p pkg/user_v1
 	protoc --proto_path api/user_v1 \
+	--proto_path vendor.protogen \
 	--go_out=pkg/user_v1 --go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
 	--go-grpc_out=pkg/user_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	--grpc-gateway_out=pkg/user_v1 --grpc-gateway_opt=paths=source_relative \
-	--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \	 
+	--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
 	api/user_v1/user.proto
 
 server-up:
