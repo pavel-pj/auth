@@ -3,15 +3,18 @@ package app
 import (
 	env "auth/internal/config/env"
 	"auth/internal/interceptor"
+	"auth/internal/vault"
+	_ "auth/pkg/statik"
 	desc "auth/pkg/user_v1"
 	"context"
+	"crypto/tls"
+	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"net/http"
 	"sync"
-
-	_ "auth/pkg/statik"
 
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/cors"
@@ -21,7 +24,6 @@ import (
 	"github.com/pavel-pj/platform_lib/pkg/closer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -33,6 +35,7 @@ type App struct {
 	grpcServer      *grpc.Server
 	httpServer      *http.Server
 	swaggerServer   *http.Server
+	vaultCerts      *vault.Certs
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -94,6 +97,7 @@ func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(context.Context) error{
 		a.initConfig,
 		a.initServiceProvider,
+		a.initVault,
 		a.initGRPCServer,
 		a.initHTTPServer,
 		a.initSwaggerServer,
@@ -123,15 +127,36 @@ func (a *App) initServiceProvider(_ context.Context) error {
 	return nil
 }
 
-func (a *App) initGRPCServer(ctx context.Context) error {
+func (a *App) initVault(ctx context.Context) error {
+	cfg := a.serviceProvider.GetVaultConfig()
 
-	creds, err := credentials.NewServerTLSFromFile("service.pem", "service.key")
+	certs, err := vault.Load(ctx, vault.Config{
+		Address:    cfg.Address(),
+		Token:      cfg.Token(),
+		RoleID:     cfg.RoleID(),
+		SecretID:   cfg.SecretID(),
+		Mount:      cfg.KVMount(),
+		SecretPath: cfg.SecretPath(),
+		ServerName: cfg.TLSServerName(),
+	})
 	if err != nil {
-		log.Fatalf("Could not load tls sertificate:%w", err)
+		return fmt.Errorf("init vault: %w", err)
 	}
 
+	a.vaultCerts = certs
+	log.Printf("TLS certificates loaded from Vault")
+	return nil
+}
+
+func (a *App) initGRPCServer(ctx context.Context) error {
+
+	//creds, err := credentials.NewServerTLSFromFile("service.pem", "service.key")
+	//if err != nil {
+	//	log.Fatalf("Could not load tls sertificate:%w", err)
+	//}
+
 	a.grpcServer = grpc.NewServer(
-		grpc.Creds(creds),
+		grpc.Creds(credentials.NewTLS(a.vaultCerts.ServerTLS)),
 		grpc.ChainUnaryInterceptor(
 			interceptor.ValidateInterceptor,
 			interceptor.RecoveryInterceptor),
@@ -153,8 +178,14 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 
 	mux := gwruntime.NewServeMux()
 
+	clientCreds := credentials.NewTLS(&tls.Config{
+		RootCAs:    a.vaultCerts.CAPool,
+		ServerName: a.vaultCerts.ServerName,
+		MinVersion: tls.VersionTLS12,
+	})
+
 	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithTransportCredentials(clientCreds),
 	}
 
 	err := desc.RegisterUserV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GetGRPCConfig().Address(), opts)
@@ -169,8 +200,9 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 		AllowCredentials: true,
 	})
 	a.httpServer = &http.Server{
-		Addr:    a.serviceProvider.GetHTTPConfig().Address(),
-		Handler: corsMiddleWare.Handler(mux),
+		Addr:      a.serviceProvider.GetHTTPConfig().Address(),
+		Handler:   corsMiddleWare.Handler(mux),
+		TLSConfig: a.vaultCerts.ServerTLS.Clone(),
 	}
 
 	return nil
@@ -220,7 +252,10 @@ func (a *App) runHTTPServer() error {
 	addr := a.serviceProvider.GetHTTPConfig().Address()
 	log.Printf("HTTP Server is running in %s", addr)
 
-	err := a.httpServer.ListenAndServe()
+	err := a.httpServer.ListenAndServeTLS("", "")
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
 
 	if err != nil {
 		return err

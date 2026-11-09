@@ -31,6 +31,7 @@ type serviceProvider struct {
 	grpcConfig    config.GRPCConfig
 	httpConfig    config.HTTPConfig
 	swaggerConfig config.SwaggerConfig
+	vaultConfig   config.VaultConfig
 
 	//pgPool *pgxpool.Pool
 	pgClient  db.Client
@@ -105,6 +106,18 @@ func (s *serviceProvider) GetSwaggerConfig() config.SwaggerConfig {
 
 	return s.swaggerConfig
 
+}
+
+func (s *serviceProvider) GetVaultConfig() config.VaultConfig {
+	if s.vaultConfig == nil {
+		conf, err := env.NewVaultConfig()
+		if err != nil {
+			log.Fatalf("failed to get vault config: %s", err.Error())
+		}
+		s.vaultConfig = conf
+	}
+
+	return s.vaultConfig
 }
 
 func (s *serviceProvider) GetDBClient(ctx context.Context) db.Client {
