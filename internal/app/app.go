@@ -20,6 +20,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pavel-pj/platform_lib/pkg/closer"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
@@ -124,8 +125,13 @@ func (a *App) initServiceProvider(_ context.Context) error {
 
 func (a *App) initGRPCServer(ctx context.Context) error {
 
+	creds, err := credentials.NewServerTLSFromFile("service.pem", "service.key")
+	if err != nil {
+		log.Fatalf("Could not load tls sertificate:%w", err)
+	}
+
 	a.grpcServer = grpc.NewServer(
-		grpc.Creds(insecure.NewCredentials()),
+		grpc.Creds(creds),
 		grpc.ChainUnaryInterceptor(
 			interceptor.ValidateInterceptor,
 			interceptor.RecoveryInterceptor),

@@ -1,2 +1,4 @@
 bin/
 vendor.protogen
+/certs
+/.env
