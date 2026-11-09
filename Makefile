@@ -11,24 +11,26 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.14.0
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.33.0
-	GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate@v1.3.3
+	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.33.0
+	GOBIN=$(LOCAL_BIN) go install github.com/rakyll/statik@v0.1.7
 
 
 
 generate: generate-user-api
+	mkdir -p pkg/swagger
+	$(LOCAL_BIN)/statik -src=pkg/swagger -dest=pkg -include="*.css,*.html,*.js,*.json,*.png" -f
 
 generate-user-api:
-	mkdir -p pkg/user_v1
+	mkdir -p pkg/user_v1 pkg/swagger
 	protoc --proto_path api/user_v1  --proto_path vendor.protogen \
-	--proto_path vendor.protogen \
 	--go_out=pkg/user_v1 --go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
 	--go-grpc_out=pkg/user_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	--grpc-gateway_out=pkg/user_v1 --grpc-gateway_opt=paths=source_relative \
 	--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
-	--validate_out lang=go:pkg/user_v1 --validate_opt=paths=source_relative \
-	--plugin=protoc-gen-validate=bin//protoc-gen-validate \
+	--openapiv2_out=allow_merge=true,merge_file_name=api:pkg/swagger \
+	--plugin=protoc-gen-openapiv2=bin/protoc-gen-openapiv2 \
 	api/user_v1/user.proto
 
 server-up:
@@ -66,15 +68,23 @@ lib:
 
 
 vendor-proto:
-	@if [ ! -d vendor.protogen/validate ]; then \
-		mkdir -p vendor.protogen/validate &&\
-		git clone https://github.com/envoyproxy/protoc-gen-validate vendor.protogen/protoc-gen-validate &&\
-		mv vendor.protogen/protoc-gen-validate/validate/*.proto vendor.protogen/validate &&\
-		rm -rf vendor.protogen/protoc-gen-validate ;\
-	fi
+	@if [ ! -f vendor.protogen/buf/validate/validate.proto ]; then \
+		rm -rf vendor.protogen/protovalidate &&\
+		git clone --depth=1 https://github.com/bufbuild/protovalidate vendor.protogen/protovalidate &&\
+		mkdir -p vendor.protogen/buf/validate &&\
+		cp vendor.protogen/protovalidate/proto/protovalidate/buf/validate/*.proto vendor.protogen/buf/validate/ &&\
+		rm -rf vendor.protogen/protovalidate ;\
+	fi	
 	@if [ ! -d vendor.protogen/google ]; then \
 		git clone https://github.com/googleapis/googleapis vendor.protogen/googleapis &&\
 		mkdir -p vendor.protogen/google/ &&\
 		mv vendor.protogen/googleapis/google/api vendor.protogen/google &&\
 		rm -rf vendor.protogen/googleapis ;\
+	fi
+	@if [ ! -f vendor.protogen/protoc-gen-openapiv2/options/annotations.proto ]; then \
+		rm -rf vendor.protogen/openapiv2 &&\
+		git clone --depth=1 --branch v2.33.0 https://github.com/grpc-ecosystem/grpc-gateway vendor.protogen/openapiv2 &&\
+		mkdir -p vendor.protogen/protoc-gen-openapiv2/options &&\
+		mv vendor.protogen/openapiv2/protoc-gen-openapiv2/options/*.proto vendor.protogen/protoc-gen-openapiv2/options &&\
+		rm -rf vendor.protogen/openapiv2 ;\
 	fi

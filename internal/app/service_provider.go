@@ -27,9 +27,10 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig   config.PGConfig
-	grpcConfig config.GRPCConfig
-	httpConfig config.HTTPConfig
+	pgConfig      config.PGConfig
+	grpcConfig    config.GRPCConfig
+	httpConfig    config.HTTPConfig
+	swaggerConfig config.SwaggerConfig
 
 	//pgPool *pgxpool.Pool
 	pgClient  db.Client
@@ -88,6 +89,21 @@ func (s *serviceProvider) GetHTTPConfig() config.HTTPConfig {
 	}
 
 	return s.httpConfig
+
+}
+
+func (s *serviceProvider) GetSwaggerConfig() config.SwaggerConfig {
+
+	if s.swaggerConfig == nil {
+		conf, err := env.NewSwaggerConfig()
+		if err != nil {
+			log.Fatalf("failed to get swagger config: %s", err.Error())
+		}
+
+		s.swaggerConfig = conf
+	}
+
+	return s.swaggerConfig
 
 }
 

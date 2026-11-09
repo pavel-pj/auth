@@ -8,11 +8,6 @@ import (
 
 func (s *Implementation) Store(ctx context.Context, req *desc.StoreRequest) (*desc.StoreResponse, error) {
 
-	err := req.Validate()
-	if err != nil {
-		return nil, err
-	}
-
 	if req.GetUser().Password != req.GetUser().PasswordConfirm {
 		return &desc.StoreResponse{}, ErrorPasswwordConfirmation
 	}

@@ -34,7 +34,8 @@ func TestCreate(t *testing.T) {
 		mc  = minimock.NewController(t)
 
 		id           = gofakeit.Int64()
-		name         = gofakeit.Name()
+		subName      = gofakeit.Name()
+		name         = subName[:7]
 		email        = gofakeit.Email()
 		password     = "Password04%"
 		passwordFail = "Password04_"
