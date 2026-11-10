@@ -16,3 +16,7 @@ type UserService interface {
 type LogService interface {
 	Store(ctx context.Context, log model.Log) error
 }
+
+type AuthService interface {
+	Login(ctx context.Context, login, password string) (string, error)
+}

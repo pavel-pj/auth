@@ -6,7 +6,7 @@ import (
 	"context"
 )
 
-func (s *Implementation) Index(ctx context.Context, req *desc.IndexRequest) (*desc.IndexResponse, error) {
+func (s *UserImplementation) Index(ctx context.Context, req *desc.IndexRequest) (*desc.IndexResponse, error) {
 
 	limit := req.GetLimit()
 	offset := req.GetOffset()

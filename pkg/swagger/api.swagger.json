@@ -11,6 +11,9 @@
   "tags": [
     {
       "name": "UserV1"
+    },
+    {
+      "name": "AuthV1"
     }
   ],
   "host": "localhost:50570",

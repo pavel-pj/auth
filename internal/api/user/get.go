@@ -6,7 +6,7 @@ import (
 	"context"
 )
 
-func (s *Implementation) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetResponse, error) {
+func (s *UserImplementation) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetResponse, error) {
 
 	id := req.GetId()
 	result, err := s.serv.Get(ctx, id)

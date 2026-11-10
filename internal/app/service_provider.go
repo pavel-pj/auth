@@ -6,19 +6,23 @@ import (
 	"context"
 	"log"
 
-	grpcApi "auth/internal/api/user"
-	implSerivce "auth/internal/api/user"
+	grpcAuthApi "auth/internal/api/auth"
+	implAuthSerivce "auth/internal/api/auth"
+	grpcUserApi "auth/internal/api/user"
+	implUserSerivce "auth/internal/api/user"
 
-	//db "auth/internal/client/db"
-	//pg "auth/internal/client/db/pg"
 	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 	pg "github.com/pavel-pj/platform_lib/pkg/client/db/pg"
 
 	env "auth/internal/config/env"
+
 	repository "auth/internal/repository"
+	authRepo "auth/internal/repository/auth"
 	logRepo "auth/internal/repository/log"
 	userRepo "auth/internal/repository/user"
+
 	service "auth/internal/service"
+	authServ "auth/internal/service/auth"
 	logServ "auth/internal/service/log"
 	userServ "auth/internal/service/user"
 
@@ -39,11 +43,14 @@ type serviceProvider struct {
 
 	userRepository repository.UserRepository
 	logRepository  repository.LogRepository
+	authRepository repository.AuthRepository
 
 	userService service.UserService
 	logService  service.LogService
+	authService service.AuthService
 
-	userImpl *grpcApi.Implementation
+	userImpl *grpcUserApi.UserImplementation
+	authImpl *grpcAuthApi.AuthImplementation
 }
 
 func NewServiceProvider() *serviceProvider {
@@ -173,6 +180,14 @@ func (s *serviceProvider) GetLogRepository(ctx context.Context) repository.LogRe
 	return s.logRepository
 }
 
+func (s *serviceProvider) GetAuthRepository(ctx context.Context) repository.AuthRepository {
+	if s.authRepository == nil {
+		s.authRepository = authRepo.NewAuthRepository(s.GetDBClient(ctx))
+
+	}
+	return s.authRepository
+}
+
 func (s *serviceProvider) GetUserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
 		s.userService = userServ.NewUserService(
@@ -191,10 +206,26 @@ func (s *serviceProvider) GetLogService(ctx context.Context) service.LogService 
 	return s.logService
 }
 
-func (s *serviceProvider) GetUserImplimentation(ctx context.Context) *grpcApi.Implementation {
+func (s *serviceProvider) GetAuthService(ctx context.Context) service.AuthService {
+	if s.authService == nil {
+		s.authService = authServ.NewAuthService(s.GetAuthRepository(ctx))
+	}
+
+	return s.authService
+}
+
+func (s *serviceProvider) GetUserImplimentation(ctx context.Context) *grpcUserApi.UserImplementation {
 	if s.userImpl == nil {
-		s.userImpl = implSerivce.NewUserImplimentation(s.GetUserService(ctx))
+		s.userImpl = implUserSerivce.NewUserImplimentation(s.GetUserService(ctx))
 	}
 
 	return s.userImpl
+}
+
+func (s *serviceProvider) GetAuthImplimentation(ctx context.Context) *grpcAuthApi.AuthImplementation {
+	if s.authImpl == nil {
+		s.authImpl = implAuthSerivce.NewAuthImplimentation(s.GetAuthService(ctx))
+	}
+
+	return s.authImpl
 }

@@ -5,7 +5,7 @@ import (
 	"context"
 )
 
-func (s *Implementation) Delete(ctx context.Context, req *desc.DeleteRequest) (*desc.DeleteResponse, error) {
+func (s *UserImplementation) Delete(ctx context.Context, req *desc.DeleteRequest) (*desc.DeleteResponse, error) {
 
 	id := req.GetId()
 	err := s.serv.Delete(ctx, id)

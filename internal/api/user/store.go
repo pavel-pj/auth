@@ -6,7 +6,7 @@ import (
 	"context"
 )
 
-func (s *Implementation) Store(ctx context.Context, req *desc.StoreRequest) (*desc.StoreResponse, error) {
+func (s *UserImplementation) Store(ctx context.Context, req *desc.StoreRequest) (*desc.StoreResponse, error) {
 
 	if req.GetUser().Password != req.GetUser().PasswordConfirm {
 		return &desc.StoreResponse{}, ErrorPasswwordConfirmation

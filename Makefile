@@ -16,22 +16,44 @@ install-deps:
 
 
 
-generate: generate-user-api
+generate: 
+	make generate-user-api 
+	make generate-auth-api 
+	make generate-openapi
 	mkdir -p pkg/swagger
 	$(LOCAL_BIN)/statik -src=pkg/swagger -dest=pkg -include="*.css,*.html,*.js,*.json,*.png" -f
 
 generate-user-api:
-	mkdir -p pkg/user_v1 pkg/swagger
-	protoc --proto_path api/user_v1  --proto_path vendor.protogen \
+	mkdir -p pkg/user_v1
+	protoc --proto_path api/user_v1 --proto_path vendor.protogen \
 	--go_out=pkg/user_v1 --go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
 	--go-grpc_out=pkg/user_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	--grpc-gateway_out=pkg/user_v1 --grpc-gateway_opt=paths=source_relative \
 	--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
+	api/user_v1/user.proto
+
+generate-auth-api:
+	mkdir -p pkg/auth_v1
+	protoc --proto_path api/auth_v1 --proto_path vendor.protogen \
+	--go_out=pkg/auth_v1 --go_opt=paths=source_relative \
+	--plugin=protoc-gen-go=bin/protoc-gen-go \
+	--go-grpc_out=pkg/auth_v1 --go-grpc_opt=paths=source_relative \
+	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
+	--grpc-gateway_out=pkg/auth_v1 --grpc-gateway_opt=paths=source_relative \
+	--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
+	api/auth_v1/auth.proto
+
+# OpenAPI is generated once, in a single protoc invocation, so allow_merge
+# actually merges user_v1 and auth_v1 into one api.swagger.json.
+generate-openapi: generate-user-api generate-auth-api
+	mkdir -p pkg/swagger
+	protoc --proto_path api --proto_path vendor.protogen \
 	--openapiv2_out=allow_merge=true,merge_file_name=api:pkg/swagger \
 	--plugin=protoc-gen-openapiv2=bin/protoc-gen-openapiv2 \
-	api/user_v1/user.proto
+	api/user_v1/user.proto api/auth_v1/auth.proto
+
 
 server-up:
 	go run cmd/grpc_server/main.go

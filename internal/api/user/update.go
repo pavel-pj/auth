@@ -6,7 +6,7 @@ import (
 	"context"
 )
 
-func (s *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*desc.UpdateResponse, error) {
+func (s *UserImplementation) Update(ctx context.Context, req *desc.UpdateRequest) (*desc.UpdateResponse, error) {
 
 	data := converter.ToUserPatchFromProto(req)
 	updated, err := s.serv.Update(ctx, data)

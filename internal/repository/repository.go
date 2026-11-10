@@ -17,3 +17,7 @@ type UserRepository interface {
 type LogRepository interface {
 	Store(ctx context.Context, logs logModel.Log) error
 }
+
+type AuthRepository interface {
+	Login(ctx context.Context, login, password string) (string, error)
+}

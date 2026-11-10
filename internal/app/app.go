@@ -4,6 +4,7 @@ import (
 	env "auth/internal/config/env"
 	"auth/internal/interceptor"
 	"auth/internal/vault"
+	descAuth "auth/pkg/auth_v1"
 	_ "auth/pkg/statik"
 	desc "auth/pkg/user_v1"
 	"context"
@@ -165,6 +166,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	reflection.Register(a.grpcServer)
 
 	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.GetUserImplimentation(ctx))
+	descAuth.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.GetAuthImplimentation(ctx))
 
 	closer.Add(func() error {
 		a.grpcServer.GracefulStop()
@@ -231,7 +233,6 @@ func (a *App) initSwaggerServer(_ context.Context) error {
 }
 
 func (a *App) runGRPCServer() error {
-	//log.Printf("GRPC Server is running in %s", a.serviceProvider.grpcConfig.Address())
 
 	list, err := net.Listen("tcp", a.serviceProvider.GetGRPCConfig().Address())
 	if err != nil {

@@ -10,13 +10,13 @@ var (
 	ErrorPasswwordConfirmation = errors.New("passwords and password confirmation are not equal")
 )
 
-type Implementation struct {
+type UserImplementation struct {
 	desc.UnimplementedUserV1Server
 	serv service.UserService
 }
 
-func NewUserImplimentation(userService service.UserService) *Implementation {
-	return &Implementation{
+func NewUserImplimentation(userService service.UserService) *UserImplementation {
+	return &UserImplementation{
 		serv: userService,
 	}
 }
