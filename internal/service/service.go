@@ -19,4 +19,5 @@ type LogService interface {
 
 type AuthService interface {
 	Login(ctx context.Context, login, password string) (string, error)
+	GetRefreshToken(ctx context.Context, refreshToken string) (string, error)
 }

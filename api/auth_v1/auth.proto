@@ -7,7 +7,7 @@ option go_package = "auth/pkg/auth_v1;auth_v1";
 service AuthV1 {
     rpc Login(LoginRequest) returns (LoginResponse);
     rpc GetRefreshToken(GetRefreshRequest) returns (GetRefreshResponse);
-    rpc GetAccessToken(GetRefreshRequest) returns (GetRefreshResponse);
+    rpc GetAccessToken(GetAccessRequest) returns (GetAccessResponse);
 }
 
 

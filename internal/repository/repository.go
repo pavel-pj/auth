@@ -19,5 +19,5 @@ type LogRepository interface {
 }
 
 type AuthRepository interface {
-	Login(ctx context.Context, login, password string) (string, error)
+	GetUserHash(ctx context.Context, login string) (model.UserLogin, error)
 }

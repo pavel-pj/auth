@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthV1Client interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	GetRefreshToken(ctx context.Context, in *GetRefreshRequest, opts ...grpc.CallOption) (*GetRefreshResponse, error)
-	GetAccessToken(ctx context.Context, in *GetRefreshRequest, opts ...grpc.CallOption) (*GetRefreshResponse, error)
+	GetAccessToken(ctx context.Context, in *GetAccessRequest, opts ...grpc.CallOption) (*GetAccessResponse, error)
 }
 
 type authV1Client struct {
@@ -53,8 +53,8 @@ func (c *authV1Client) GetRefreshToken(ctx context.Context, in *GetRefreshReques
 	return out, nil
 }
 
-func (c *authV1Client) GetAccessToken(ctx context.Context, in *GetRefreshRequest, opts ...grpc.CallOption) (*GetRefreshResponse, error) {
-	out := new(GetRefreshResponse)
+func (c *authV1Client) GetAccessToken(ctx context.Context, in *GetAccessRequest, opts ...grpc.CallOption) (*GetAccessResponse, error) {
+	out := new(GetAccessResponse)
 	err := c.cc.Invoke(ctx, "/auth_v1.AuthV1/GetAccessToken", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (c *authV1Client) GetAccessToken(ctx context.Context, in *GetRefreshRequest
 type AuthV1Server interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	GetRefreshToken(context.Context, *GetRefreshRequest) (*GetRefreshResponse, error)
-	GetAccessToken(context.Context, *GetRefreshRequest) (*GetRefreshResponse, error)
+	GetAccessToken(context.Context, *GetAccessRequest) (*GetAccessResponse, error)
 	mustEmbedUnimplementedAuthV1Server()
 }
 
@@ -82,7 +82,7 @@ func (UnimplementedAuthV1Server) Login(context.Context, *LoginRequest) (*LoginRe
 func (UnimplementedAuthV1Server) GetRefreshToken(context.Context, *GetRefreshRequest) (*GetRefreshResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRefreshToken not implemented")
 }
-func (UnimplementedAuthV1Server) GetAccessToken(context.Context, *GetRefreshRequest) (*GetRefreshResponse, error) {
+func (UnimplementedAuthV1Server) GetAccessToken(context.Context, *GetAccessRequest) (*GetAccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccessToken not implemented")
 }
 func (UnimplementedAuthV1Server) mustEmbedUnimplementedAuthV1Server() {}
@@ -135,7 +135,7 @@ func _AuthV1_GetRefreshToken_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _AuthV1_GetAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRefreshRequest)
+	in := new(GetAccessRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func _AuthV1_GetAccessToken_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/auth_v1.AuthV1/GetAccessToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthV1Server).GetAccessToken(ctx, req.(*GetRefreshRequest))
+		return srv.(AuthV1Server).GetAccessToken(ctx, req.(*GetAccessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -206,9 +206,14 @@ func (s *serviceProvider) GetLogService(ctx context.Context) service.LogService 
 	return s.logService
 }
 
-func (s *serviceProvider) GetAuthService(ctx context.Context) service.AuthService {
+func (s *serviceProvider) GetAuthService(
+	ctx context.Context,
+	jwtSecret string) service.AuthService {
 	if s.authService == nil {
-		s.authService = authServ.NewAuthService(s.GetAuthRepository(ctx))
+		s.authService = authServ.NewAuthService(
+			s.GetAuthRepository(ctx),
+			[]byte(jwtSecret),
+		)
 	}
 
 	return s.authService
@@ -222,9 +227,12 @@ func (s *serviceProvider) GetUserImplimentation(ctx context.Context) *grpcUserAp
 	return s.userImpl
 }
 
-func (s *serviceProvider) GetAuthImplimentation(ctx context.Context) *grpcAuthApi.AuthImplementation {
+func (s *serviceProvider) GetAuthImplimentation(
+	ctx context.Context,
+	jwtSecret string,
+) *grpcAuthApi.AuthImplementation {
 	if s.authImpl == nil {
-		s.authImpl = implAuthSerivce.NewAuthImplimentation(s.GetAuthService(ctx))
+		s.authImpl = implAuthSerivce.NewAuthImplimentation(s.GetAuthService(ctx, jwtSecret))
 	}
 
 	return s.authImpl

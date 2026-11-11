@@ -24,4 +24,7 @@ type VaultConfig interface {
 	KVMount() string
 	SecretPath() string
 	TLSServerName() string
+
+	JWTSecretPath() string
+	JWTSecretField() string
 }

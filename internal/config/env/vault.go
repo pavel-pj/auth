@@ -14,6 +14,9 @@ type VaultConfig struct {
 	kvMount    string
 	secretPath string
 	serverName string
+
+	jwtSecret     string
+	jwtSecretPath string
 }
 
 func NewVaultConfig() (VaultConfig, error) {
@@ -31,6 +34,12 @@ func NewVaultConfig() (VaultConfig, error) {
 	cfg.kvMount = getEnv("VAULT_KV_MOUNT", "secret")
 	cfg.secretPath = getEnv("VAULT_SECRET_PATH", "auth/tls")
 	cfg.serverName = getEnv("VAULT_TLS_SERVER_NAME", "localhost")
+
+	cfg.secretPath = getEnv("VAULT_SECRET_PATH", "auth/tls")
+	cfg.serverName = getEnv("VAULT_TLS_SERVER_NAME", "localhost")
+
+	cfg.jwtSecretPath = getEnv("VAULT_JWT_SECRET_PATH", "auth/jwt")
+	cfg.jwtSecret = getEnv("VAULT_JWT_SECRET_FIELD", "secret_string")
 
 	return cfg, nil
 }
@@ -61,4 +70,12 @@ func (s VaultConfig) SecretPath() string {
 
 func (s VaultConfig) TLSServerName() string {
 	return s.serverName
+}
+
+func (s VaultConfig) JWTSecretField() string {
+	return s.jwtSecret
+}
+
+func (s VaultConfig) JWTSecretPath() string {
+	return s.jwtSecretPath
 }

@@ -36,7 +36,7 @@ type App struct {
 	grpcServer      *grpc.Server
 	httpServer      *http.Server
 	swaggerServer   *http.Server
-	vaultCerts      *vault.Certs
+	vault           *vault.Secret
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -132,20 +132,23 @@ func (a *App) initVault(ctx context.Context) error {
 	cfg := a.serviceProvider.GetVaultConfig()
 
 	certs, err := vault.Load(ctx, vault.Config{
-		Address:    cfg.Address(),
-		Token:      cfg.Token(),
-		RoleID:     cfg.RoleID(),
-		SecretID:   cfg.SecretID(),
-		Mount:      cfg.KVMount(),
-		SecretPath: cfg.SecretPath(),
-		ServerName: cfg.TLSServerName(),
+		Address:        cfg.Address(),
+		Token:          cfg.Token(),
+		RoleID:         cfg.RoleID(),
+		SecretID:       cfg.SecretID(),
+		Mount:          cfg.KVMount(),
+		SecretPath:     cfg.SecretPath(),
+		ServerName:     cfg.TLSServerName(),
+		JWTSecretPath:  cfg.JWTSecretPath(),
+		JWTSecretField: cfg.JWTSecretField(),
 	})
 	if err != nil {
 		return fmt.Errorf("init vault: %w", err)
 	}
 
-	a.vaultCerts = certs
+	a.vault = certs
 	log.Printf("TLS certificates loaded from Vault")
+
 	return nil
 }
 
@@ -157,7 +160,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	//}
 
 	a.grpcServer = grpc.NewServer(
-		grpc.Creds(credentials.NewTLS(a.vaultCerts.ServerTLS)),
+		grpc.Creds(credentials.NewTLS(a.vault.TLS.ServerTLS)),
 		grpc.ChainUnaryInterceptor(
 			interceptor.ValidateInterceptor,
 			interceptor.RecoveryInterceptor),
@@ -166,7 +169,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	reflection.Register(a.grpcServer)
 
 	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.GetUserImplimentation(ctx))
-	descAuth.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.GetAuthImplimentation(ctx))
+	descAuth.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.GetAuthImplimentation(ctx, a.vault.JWTString))
 
 	closer.Add(func() error {
 		a.grpcServer.GracefulStop()
@@ -181,8 +184,8 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 	mux := gwruntime.NewServeMux()
 
 	clientCreds := credentials.NewTLS(&tls.Config{
-		RootCAs:    a.vaultCerts.CAPool,
-		ServerName: a.vaultCerts.ServerName,
+		RootCAs:    a.vault.TLS.CAPool,
+		ServerName: a.vault.TLS.ServerName,
 		MinVersion: tls.VersionTLS12,
 	})
 
@@ -204,7 +207,7 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 	a.httpServer = &http.Server{
 		Addr:      a.serviceProvider.GetHTTPConfig().Address(),
 		Handler:   corsMiddleWare.Handler(mux),
-		TLSConfig: a.vaultCerts.ServerTLS.Clone(),
+		TLSConfig: a.vault.TLS.ServerTLS.Clone(),
 	}
 
 	return nil

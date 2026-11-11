@@ -18,15 +18,23 @@ type Config struct {
 	Mount      string
 	SecretPath string
 	ServerName string
+
+	JWTSecretPath  string
+	JWTSecretField string
 }
 
-type Certs struct {
+type TLS struct {
 	ServerTLS  *tls.Config
 	CAPool     *x509.CertPool
 	ServerName string
 }
 
-func Load(ctx context.Context, cfg Config) (*Certs, error) {
+type Secret struct {
+	TLS       TLS
+	JWTString string
+}
+
+func Load(ctx context.Context, cfg Config) (*Secret, error) {
 	client, err := newClient(ctx, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("vault client: %w", err)
@@ -57,13 +65,29 @@ func Load(ctx context.Context, cfg Config) (*Certs, error) {
 		return nil, fmt.Errorf("vault: parse ca")
 	}
 
-	return &Certs{
-		ServerTLS: &tls.Config{
-			Certificates: []tls.Certificate{pair},
-			MinVersion:   tls.VersionTLS12,
+	jwtSecret, err := client.KVv2(cfg.Mount).Get(ctx, cfg.JWTSecretPath)
+	if err != nil {
+		return nil, fmt.Errorf("vault read %s/%s: %w", cfg.Mount, cfg.JWTSecretPath, err)
+	}
+	if jwtSecret == nil || jwtSecret.Data == nil {
+		return nil, fmt.Errorf("vault: secret %s/%s not found", cfg.Mount, cfg.JWTSecretPath)
+	}
+
+	jwtValue, ok := jwtSecret.Data[cfg.JWTSecretField].(string)
+	if !ok || jwtValue == "" {
+		return nil, fmt.Errorf("vault: field %q is empty or not a string", cfg.JWTSecretField)
+	}
+
+	return &Secret{
+		TLS: TLS{
+			ServerTLS: &tls.Config{
+				Certificates: []tls.Certificate{pair},
+				MinVersion:   tls.VersionTLS12,
+			},
+			CAPool:     pool,
+			ServerName: cfg.ServerName,
 		},
-		CAPool:     pool,
-		ServerName: cfg.ServerName,
+		JWTString: jwtValue,
 	}, nil
 }
 

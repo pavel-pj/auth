@@ -114,6 +114,9 @@ vendor-proto:
 		rm -rf vendor.protogen/openapiv2 ;\
 	fi
 
+jwt-string:
+	openssl rand -base64 48
+
 
 gen-cert:
 	openssl genrsa -out ca.key 4096
