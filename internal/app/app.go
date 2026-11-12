@@ -4,6 +4,7 @@ import (
 	env "auth/internal/config/env"
 	"auth/internal/interceptor"
 	"auth/internal/vault"
+	descAccess "auth/pkg/access_v1"
 	descAuth "auth/pkg/auth_v1"
 	_ "auth/pkg/statik"
 	desc "auth/pkg/user_v1"
@@ -132,22 +133,28 @@ func (a *App) initVault(ctx context.Context) error {
 	cfg := a.serviceProvider.GetVaultConfig()
 
 	certs, err := vault.Load(ctx, vault.Config{
-		Address:        cfg.Address(),
-		Token:          cfg.Token(),
-		RoleID:         cfg.RoleID(),
-		SecretID:       cfg.SecretID(),
-		Mount:          cfg.KVMount(),
-		SecretPath:     cfg.SecretPath(),
-		ServerName:     cfg.TLSServerName(),
-		JWTSecretPath:  cfg.JWTSecretPath(),
-		JWTSecretField: cfg.JWTSecretField(),
+		Address:               cfg.Address(),
+		Token:                 cfg.Token(),
+		RoleID:                cfg.RoleID(),
+		SecretID:              cfg.SecretID(),
+		Mount:                 cfg.KVMount(),
+		SecretPath:            cfg.SecretPath(),
+		ServerName:            cfg.TLSServerName(),
+		JWTSecretPath:         cfg.JWTSecretPath(),
+		JWTAccessSecretField:  cfg.JWTAccessSecretField(),
+		JWTRefreshSecretField: cfg.JWTRefreshSecretField(),
 	})
 	if err != nil {
 		return fmt.Errorf("init vault: %w", err)
 	}
 
 	a.vault = certs
-	log.Printf("TLS certificates loaded from Vault")
+	a.serviceProvider.SetJWTSecrets(
+		certs.JWT.AccessTokenSecret,
+		certs.JWT.RefreshTokenSecret,
+	)
+
+	log.Printf("TLS certificates and JWT secrets loaded from Vault")
 
 	return nil
 }
@@ -160,7 +167,8 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	//}
 
 	a.grpcServer = grpc.NewServer(
-		grpc.Creds(credentials.NewTLS(a.vault.TLS.ServerTLS)),
+		//grpc.Creds(credentials.NewTLS(a.vault.TLS.ServerTLS)),
+		//grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.ChainUnaryInterceptor(
 			interceptor.ValidateInterceptor,
 			interceptor.RecoveryInterceptor),
@@ -169,7 +177,8 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	reflection.Register(a.grpcServer)
 
 	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.GetUserImplimentation(ctx))
-	descAuth.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.GetAuthImplimentation(ctx, a.vault.JWTString))
+	descAuth.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.GetAuthImplimentation(ctx))
+	descAccess.RegisterAccessV1Server(a.grpcServer, a.serviceProvider.GetAccessImplimentation(ctx))
 
 	closer.Add(func() error {
 		a.grpcServer.GracefulStop()

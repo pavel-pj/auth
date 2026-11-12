@@ -6,10 +6,9 @@ import (
 	"context"
 	"log"
 
+	grpcAccessApi "auth/internal/api/access"
 	grpcAuthApi "auth/internal/api/auth"
-	implAuthSerivce "auth/internal/api/auth"
 	grpcUserApi "auth/internal/api/user"
-	implUserSerivce "auth/internal/api/user"
 
 	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 	pg "github.com/pavel-pj/platform_lib/pkg/client/db/pg"
@@ -22,6 +21,7 @@ import (
 	userRepo "auth/internal/repository/user"
 
 	service "auth/internal/service"
+	accessServ "auth/internal/service/access"
 	authServ "auth/internal/service/auth"
 	logServ "auth/internal/service/log"
 	userServ "auth/internal/service/user"
@@ -45,16 +45,26 @@ type serviceProvider struct {
 	logRepository  repository.LogRepository
 	authRepository repository.AuthRepository
 
-	userService service.UserService
-	logService  service.LogService
-	authService service.AuthService
+	userService   service.UserService
+	logService    service.LogService
+	authService   service.AuthService
+	accessService service.AccessService
+	jwt           service.JWT
 
-	userImpl *grpcUserApi.UserImplementation
-	authImpl *grpcAuthApi.AuthImplementation
+	userImpl   *grpcUserApi.UserImplementation
+	authImpl   *grpcAuthApi.AuthImplementation
+	accessImpl *grpcAccessApi.AccessImplementation
 }
 
 func NewServiceProvider() *serviceProvider {
 	return &serviceProvider{}
+}
+
+func (s *serviceProvider) SetJWTSecrets(access, refresh string) {
+	s.jwt = service.JWT{
+		AccessTokenSecret:  []byte(access),
+		RefreshTokenSecret: []byte(refresh),
+	}
 }
 
 func (s *serviceProvider) GetPGConfig() config.PGConfig {
@@ -206,34 +216,47 @@ func (s *serviceProvider) GetLogService(ctx context.Context) service.LogService 
 	return s.logService
 }
 
-func (s *serviceProvider) GetAuthService(
-	ctx context.Context,
-	jwtSecret string) service.AuthService {
+func (s *serviceProvider) GetAuthService(ctx context.Context) service.AuthService {
 	if s.authService == nil {
 		s.authService = authServ.NewAuthService(
 			s.GetAuthRepository(ctx),
-			[]byte(jwtSecret),
+			s.jwt,
 		)
 	}
 
 	return s.authService
 }
 
+func (s *serviceProvider) GetAccessService(ctx context.Context) service.AccessService {
+	if s.accessService == nil {
+		s.accessService = accessServ.NewAccessService(
+			s.jwt,
+		)
+	}
+
+	return s.accessService
+}
+
 func (s *serviceProvider) GetUserImplimentation(ctx context.Context) *grpcUserApi.UserImplementation {
 	if s.userImpl == nil {
-		s.userImpl = implUserSerivce.NewUserImplimentation(s.GetUserService(ctx))
+		s.userImpl = grpcUserApi.NewUserImplimentation(s.GetUserService(ctx))
 	}
 
 	return s.userImpl
 }
 
-func (s *serviceProvider) GetAuthImplimentation(
-	ctx context.Context,
-	jwtSecret string,
-) *grpcAuthApi.AuthImplementation {
+func (s *serviceProvider) GetAuthImplimentation(ctx context.Context) *grpcAuthApi.AuthImplementation {
 	if s.authImpl == nil {
-		s.authImpl = implAuthSerivce.NewAuthImplimentation(s.GetAuthService(ctx, jwtSecret))
+		s.authImpl = grpcAuthApi.NewAuthImplimentation(s.GetAuthService(ctx))
 	}
 
 	return s.authImpl
+}
+
+func (s *serviceProvider) GetAccessImplimentation(ctx context.Context) *grpcAccessApi.AccessImplementation {
+	if s.accessImpl == nil {
+		s.accessImpl = grpcAccessApi.NewAccessImplimentation(s.GetAccessService(ctx))
+	}
+
+	return s.accessImpl
 }

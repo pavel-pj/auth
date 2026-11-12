@@ -19,6 +19,7 @@ install-deps:
 generate: 
 	make generate-user-api 
 	make generate-auth-api 
+	make generate-access-api
 	make generate-openapi
 	mkdir -p pkg/swagger
 	$(LOCAL_BIN)/statik -src=pkg/swagger -dest=pkg -include="*.css,*.html,*.js,*.json,*.png" -f
@@ -44,6 +45,17 @@ generate-auth-api:
 	--grpc-gateway_out=pkg/auth_v1 --grpc-gateway_opt=paths=source_relative \
 	--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
 	api/auth_v1/auth.proto
+
+generate-access-api:
+	mkdir -p pkg/access_v1
+	protoc --proto_path api/access_v1 --proto_path vendor.protogen \
+	--go_out=pkg/access_v1 --go_opt=paths=source_relative \
+	--plugin=protoc-gen-go=bin/protoc-gen-go \
+	--go-grpc_out=pkg/access_v1 --go-grpc_opt=paths=source_relative \
+	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
+	--grpc-gateway_out=pkg/access_v1 --grpc-gateway_opt=paths=source_relative \
+	--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
+	api/access_v1/access.proto	
 
 # OpenAPI is generated once, in a single protoc invocation, so allow_merge
 # actually merges user_v1 and auth_v1 into one api.swagger.json.

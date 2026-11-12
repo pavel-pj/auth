@@ -12,12 +12,12 @@ var (
 
 type AuthService struct {
 	Repository repository.AuthRepository
-	JWTSecret  []byte
+	JWT        service.JWT
 }
 
-func NewAuthService(repository repository.AuthRepository, jwtSecret []byte) service.AuthService {
+func NewAuthService(repository repository.AuthRepository, jwt service.JWT) service.AuthService {
 	return &AuthService{
 		Repository: repository,
-		JWTSecret:  jwtSecret,
+		JWT:        jwt,
 	}
 }

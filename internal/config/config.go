@@ -26,5 +26,6 @@ type VaultConfig interface {
 	TLSServerName() string
 
 	JWTSecretPath() string
-	JWTSecretField() string
+	JWTAccessSecretField() string
+	JWTRefreshSecretField() string
 }

@@ -15,8 +15,9 @@ type VaultConfig struct {
 	secretPath string
 	serverName string
 
-	jwtSecret     string
-	jwtSecretPath string
+	jwtSecretPath         string
+	jwtAccessSecretField  string
+	jwtRefreshSecretField string
 }
 
 func NewVaultConfig() (VaultConfig, error) {
@@ -35,11 +36,9 @@ func NewVaultConfig() (VaultConfig, error) {
 	cfg.secretPath = getEnv("VAULT_SECRET_PATH", "auth/tls")
 	cfg.serverName = getEnv("VAULT_TLS_SERVER_NAME", "localhost")
 
-	cfg.secretPath = getEnv("VAULT_SECRET_PATH", "auth/tls")
-	cfg.serverName = getEnv("VAULT_TLS_SERVER_NAME", "localhost")
-
 	cfg.jwtSecretPath = getEnv("VAULT_JWT_SECRET_PATH", "auth/jwt")
-	cfg.jwtSecret = getEnv("VAULT_JWT_SECRET_FIELD", "secret_string")
+	cfg.jwtAccessSecretField = getEnv("VAULT_JWT_ACCESS_SECRET_FIELD", "AccessTokenSecret")
+	cfg.jwtRefreshSecretField = getEnv("VAULT_JWT_REFRESH_SECRET_FIELD", "RefreshTokenSecret")
 
 	return cfg, nil
 }
@@ -72,8 +71,12 @@ func (s VaultConfig) TLSServerName() string {
 	return s.serverName
 }
 
-func (s VaultConfig) JWTSecretField() string {
-	return s.jwtSecret
+func (s VaultConfig) JWTAccessSecretField() string {
+	return s.jwtAccessSecretField
+}
+
+func (s VaultConfig) JWTRefreshSecretField() string {
+	return s.jwtRefreshSecretField
 }
 
 func (s VaultConfig) JWTSecretPath() string {

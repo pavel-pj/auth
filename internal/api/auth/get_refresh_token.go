@@ -8,9 +8,12 @@ import (
 func (a *AuthImplementation) GetRefreshToken(ctx context.Context, req *desc.GetRefreshRequest) (*desc.GetRefreshResponse, error) {
 
 	refreshToken := req.GetRefreshToken()
-	//newRefreshToken := a.serv.GetRefreshToken(ctx,refreshToken,)
+	newRefreshToken, err := a.serv.GetRefreshToken(ctx, refreshToken)
+	if err != nil {
+		return &desc.GetRefreshResponse{}, err
+	}
 
 	return &desc.GetRefreshResponse{
-		RefreshToken: refreshToken,
+		RefreshToken: newRefreshToken,
 	}, nil
 }

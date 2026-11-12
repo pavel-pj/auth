@@ -2,9 +2,9 @@ package auth
 
 import (
 	"auth/internal/model"
+	"auth/internal/service"
 	"auth/internal/utils"
 	"context"
-	"time"
 )
 
 func (s *AuthService) Login(ctx context.Context, login, password string) (string, error) {
@@ -23,8 +23,8 @@ func (s *AuthService) Login(ctx context.Context, login, password string) (string
 			Name: user.Name,
 			Role: user.Role,
 		},
-		s.JWTSecret,
-		2*time.Minute,
+		s.JWT.RefreshTokenSecret,
+		service.RefreshTokenExpiration,
 	)
 	if err != nil {
 		return "", err

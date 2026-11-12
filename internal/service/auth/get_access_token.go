@@ -2,30 +2,30 @@ package auth
 
 import (
 	"auth/internal/model"
+	"auth/internal/service"
 	"auth/internal/utils"
 	"context"
 	"errors"
-	"time"
 )
 
-func (s *AuthService) GetRefreshToken(ctx context.Context, refreshToken string) (string, error) {
+func (s *AuthService) GetAccessToken(ctx context.Context, refreshToken string) (string, error) {
 
-	claims, err := utils.VerifyToken(refreshToken, s.JWTSecret)
+	claims, err := utils.VerifyToken(refreshToken, s.JWT.RefreshTokenSecret)
 	if err != nil {
 		return "", errors.New("Could not refresh token")
 	}
 
-	newRefreshToken, err := utils.GenerateToken(model.UserAuthInfo{
+	newAccessToken, err := utils.GenerateToken(model.UserAuthInfo{
 		Name: claims.Username,
 		Role: claims.Role,
 	},
-		s.JWTSecret,
-		2*time.Minute,
+		s.JWT.AccessTokenSecret,
+		service.AccessTokenExpiration,
 	)
 	if err != nil {
 		return "", err
 	}
 
-	return newRefreshToken, nil
+	return newAccessToken, nil
 
 }

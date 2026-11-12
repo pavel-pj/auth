@@ -2,7 +2,6 @@ package utils
 
 import (
 	"auth/internal/model"
-	"log"
 	"time"
 
 	"errors"
@@ -11,8 +10,6 @@ import (
 )
 
 func GenerateToken(user model.UserAuthInfo, sercretKey []byte, duration time.Duration) (string, error) {
-
-	log.Println(user)
 
 	claims := model.UserClaims{
 		StandardClaims: jwt.StandardClaims{

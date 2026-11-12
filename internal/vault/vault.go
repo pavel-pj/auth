@@ -19,8 +19,9 @@ type Config struct {
 	SecretPath string
 	ServerName string
 
-	JWTSecretPath  string
-	JWTSecretField string
+	JWTSecretPath         string
+	JWTAccessSecretField  string
+	JWTRefreshSecretField string
 }
 
 type TLS struct {
@@ -29,9 +30,14 @@ type TLS struct {
 	ServerName string
 }
 
+type JWT struct {
+	AccessTokenSecret  string
+	RefreshTokenSecret string
+}
+
 type Secret struct {
-	TLS       TLS
-	JWTString string
+	TLS TLS
+	JWT JWT
 }
 
 func Load(ctx context.Context, cfg Config) (*Secret, error) {
@@ -73,9 +79,14 @@ func Load(ctx context.Context, cfg Config) (*Secret, error) {
 		return nil, fmt.Errorf("vault: secret %s/%s not found", cfg.Mount, cfg.JWTSecretPath)
 	}
 
-	jwtValue, ok := jwtSecret.Data[cfg.JWTSecretField].(string)
-	if !ok || jwtValue == "" {
-		return nil, fmt.Errorf("vault: field %q is empty or not a string", cfg.JWTSecretField)
+	accessSecret, ok := jwtSecret.Data[cfg.JWTAccessSecretField].(string)
+	if !ok || accessSecret == "" {
+		return nil, fmt.Errorf("vault: field %q is empty or not a string", cfg.JWTAccessSecretField)
+	}
+
+	refreshSecret, ok := jwtSecret.Data[cfg.JWTRefreshSecretField].(string)
+	if !ok || refreshSecret == "" {
+		return nil, fmt.Errorf("vault: field %q is empty or not a string", cfg.JWTRefreshSecretField)
 	}
 
 	return &Secret{
@@ -87,7 +98,10 @@ func Load(ctx context.Context, cfg Config) (*Secret, error) {
 			CAPool:     pool,
 			ServerName: cfg.ServerName,
 		},
-		JWTString: jwtValue,
+		JWT: JWT{
+			AccessTokenSecret:  accessSecret,
+			RefreshTokenSecret: refreshSecret,
+		},
 	}, nil
 }
 

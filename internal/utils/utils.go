@@ -4,8 +4,6 @@ import (
 	"github.com/sppps/pwdhash"
 )
 
-func VerifyPassword(hashedPassword, candidatePassword string) bool {
-
-	err := pwdhash.Validate(hashedPassword, candidatePassword)
-	return err == nil
+func VerifyPassword(password, hash string) bool {
+	return pwdhash.Validate(password, hash) == nil
 }
