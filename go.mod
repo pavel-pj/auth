@@ -1,4 +1,4 @@
-module auth
+module github.com/pavel-pj/auth
 
 go 1.27.3
 
@@ -7,6 +7,7 @@ require (
 	buf.build/go/protovalidate v1.4.0
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/brianvoe/gofakeit/v7 v7.18.1
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gojuno/minimock/v3 v3.4.7
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.33.0
 	github.com/hashicorp/vault/api v1.23.0
@@ -29,7 +30,6 @@ require (
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/georgysavva/scany/v2 v2.1.4 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect

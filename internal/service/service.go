@@ -1,8 +1,8 @@
 package service
 
 import (
-	"auth/internal/model"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
 	"time"
 )
 

@@ -1,7 +1,7 @@
 package auth
 
 import (
-	repo "auth/internal/repository"
+	repo "github.com/pavel-pj/auth/internal/repository"
 
 	sq "github.com/Masterminds/squirrel"
 	db "github.com/pavel-pj/platform_lib/pkg/client/db"

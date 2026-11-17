@@ -1,8 +1,8 @@
 package user
 
 import (
-	desc "auth/pkg/user_v1"
 	"context"
+	desc "github.com/pavel-pj/auth/pkg/user_v1"
 )
 
 func (s *UserImplementation) Delete(ctx context.Context, req *desc.DeleteRequest) (*desc.DeleteResponse, error) {

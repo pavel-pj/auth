@@ -1,18 +1,18 @@
 package tests
 
 import (
-	dbMocks "auth/internal/client/mocks"
-	"auth/internal/model"
-	"auth/internal/repository"
-	"auth/internal/service"
 	"context"
 	"errors"
+	dbMocks "github.com/pavel-pj/auth/internal/client/mocks"
+	"github.com/pavel-pj/auth/internal/model"
+	"github.com/pavel-pj/auth/internal/repository"
+	"github.com/pavel-pj/auth/internal/service"
 	"testing"
 	"time"
 
-	repositoryMocks "auth/internal/repository/mocks"
-	serviceMocks "auth/internal/service/mocks"
-	userService "auth/internal/service/user"
+	repositoryMocks "github.com/pavel-pj/auth/internal/repository/mocks"
+	serviceMocks "github.com/pavel-pj/auth/internal/service/mocks"
+	userService "github.com/pavel-pj/auth/internal/service/user"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/gojuno/minimock/v3"

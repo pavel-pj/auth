@@ -1,9 +1,9 @@
 package repository
 
 import (
-	repo "auth/internal/repository"
-	model "auth/internal/repository/log/model"
 	"context"
+	repo "github.com/pavel-pj/auth/internal/repository"
+	model "github.com/pavel-pj/auth/internal/repository/log/model"
 	"time"
 
 	"github.com/pavel-pj/platform_lib/pkg/client/db"

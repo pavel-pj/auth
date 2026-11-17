@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	model "auth/internal/model"
+	model "github.com/pavel-pj/auth/internal/model"
 )
 
 func (s UserService) Store(ctx context.Context, user model.UserCreate) (int64, error) {

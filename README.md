@@ -266,7 +266,7 @@ Swagger UI — это статика из `pkg/swagger`, встроенная в
 - в `internal/app/app.go` обязателен blank-import:
 
 ```go
-_ "auth/pkg/statik"
+_ "github.com/pavel-pj/auth/pkg/statik"
 ```
 
 Без него при старте будет ошибка:
@@ -359,7 +359,7 @@ CI/CD (`.github/workflows/deployment.yml`, push в `main`):
 Создайте `.env` (см. раздел «Конфигурация»).
 
 **`statik/fs: no zip data registered`**
-Нет blank-import `_ "auth/pkg/statik"` или устарел `pkg/statik`. Выполните `make generate` и перезапустите.
+Нет blank-import `_ "github.com/pavel-pj/auth/pkg/statik"` или устарел `pkg/statik`. Выполните `make generate` и перезапустите.
 
 **`no required module provides package ...`**
 Добавьте зависимость (`go get <module>`) или `go mod tidy`; для CLI-утилит — `make install-deps`.

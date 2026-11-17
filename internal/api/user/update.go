@@ -1,9 +1,9 @@
 package user
 
 import (
-	converter "auth/internal/converter/user"
-	desc "auth/pkg/user_v1"
 	"context"
+	converter "github.com/pavel-pj/auth/internal/converter/user"
+	desc "github.com/pavel-pj/auth/pkg/user_v1"
 )
 
 func (s *UserImplementation) Update(ctx context.Context, req *desc.UpdateRequest) (*desc.UpdateResponse, error) {

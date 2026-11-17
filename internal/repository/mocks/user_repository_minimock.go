@@ -5,8 +5,8 @@ package mocks
 //go:generate minimock -i auth/internal/repository.UserRepository -o user_repository_minimock.go -n UserRepositoryMock -p mocks
 
 import (
-	"auth/internal/model"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
 	"sync"
 	mm_atomic "sync/atomic"
 	mm_time "time"

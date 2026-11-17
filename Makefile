@@ -93,7 +93,7 @@ lint:
  
 tests-cover:	
 	go test -count=5 \
-		-coverpkg=auth/internal/api/user,auth/internal/service/user \
+		-coverpkg=github.com/pavel-pj/auth/internal/api/user,github.com/pavel-pj/auth/internal/service/user \
 		-coverprofile=coverage.out \
 		./internal/api/user/tests ./internal/service/user/tests
 	go tool cover -func=coverage.out

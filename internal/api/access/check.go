@@ -1,8 +1,8 @@
 package auth
 
 import (
-	desc "auth/pkg/access_v1"
 	"context"
+	desc "github.com/pavel-pj/auth/pkg/access_v1"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )

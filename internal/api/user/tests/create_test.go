@@ -1,17 +1,17 @@
 package tests
 
 import (
-	userApi "auth/internal/api/user"
-	"auth/internal/model"
-	"auth/internal/service"
+	userApi "github.com/pavel-pj/auth/internal/api/user"
+	"github.com/pavel-pj/auth/internal/model"
+	"github.com/pavel-pj/auth/internal/service"
 
-	desc "auth/pkg/user_v1"
 	"fmt"
+	desc "github.com/pavel-pj/auth/pkg/user_v1"
 
 	"context"
 	"testing"
 
-	serviceMocks "auth/internal/service/mocks"
+	serviceMocks "github.com/pavel-pj/auth/internal/service/mocks"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/gojuno/minimock/v3"

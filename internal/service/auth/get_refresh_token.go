@@ -1,11 +1,11 @@
 package auth
 
 import (
-	"auth/internal/model"
-	"auth/internal/service"
-	"auth/internal/utils"
 	"context"
 	"errors"
+	"github.com/pavel-pj/auth/internal/model"
+	"github.com/pavel-pj/auth/internal/service"
+	"github.com/pavel-pj/auth/internal/utils"
 )
 
 func (s *AuthService) GetRefreshToken(ctx context.Context, refreshToken string) (string, error) {

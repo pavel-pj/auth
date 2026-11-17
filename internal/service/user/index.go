@@ -1,8 +1,8 @@
 package user
 
 import (
-	"auth/internal/model"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
 )
 
 const (

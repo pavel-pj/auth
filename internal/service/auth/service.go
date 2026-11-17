@@ -1,9 +1,9 @@
 package auth
 
 import (
-	"auth/internal/repository"
-	"auth/internal/service"
 	"errors"
+	"github.com/pavel-pj/auth/internal/repository"
+	"github.com/pavel-pj/auth/internal/service"
 )
 
 var (

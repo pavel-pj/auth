@@ -1,8 +1,8 @@
 package user
 
 import (
-	"auth/internal/model"
-	desc "auth/pkg/user_v1"
+	"github.com/pavel-pj/auth/internal/model"
+	desc "github.com/pavel-pj/auth/pkg/user_v1"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"

@@ -1,8 +1,8 @@
 package user
 
 import (
-	"auth/internal/model"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
 )
 
 func (s UserService) Get(ctx context.Context, id int64) (model.User, error) {

@@ -1,8 +1,8 @@
 package main
 
 import (
-	a "auth/internal/app"
 	"context"
+	a "github.com/pavel-pj/auth/internal/app"
 	"log"
 )
 

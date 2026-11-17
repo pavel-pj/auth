@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"auth/internal/model"
-	"auth/internal/service"
-	"auth/internal/utils"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
+	"github.com/pavel-pj/auth/internal/service"
+	"github.com/pavel-pj/auth/internal/utils"
 )
 
 func (s *AuthService) Login(ctx context.Context, login, password string) (string, error) {

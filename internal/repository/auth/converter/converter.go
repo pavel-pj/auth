@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"auth/internal/model"
-	modelRepo "auth/internal/repository/auth/model"
+	"github.com/pavel-pj/auth/internal/model"
+	modelRepo "github.com/pavel-pj/auth/internal/repository/auth/model"
 )
 
 func UserLoginFromRepoToService(u modelRepo.UserLogin) model.UserLogin {

@@ -1,8 +1,8 @@
 package converter
 
 import (
-	modelService "auth/internal/model"
-	modelRepo "auth/internal/repository/log/model"
+	modelService "github.com/pavel-pj/auth/internal/model"
+	modelRepo "github.com/pavel-pj/auth/internal/repository/log/model"
 )
 
 func ToRepoLogFromService(data modelService.Log) modelRepo.Log {

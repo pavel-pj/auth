@@ -1,11 +1,11 @@
 package user
 
 import (
-	"auth/internal/model"
+	"github.com/pavel-pj/auth/internal/model"
 
 	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 
-	//modelRepo "auth/internal/repository/model"
+	//modelRepo "github.com/pavel-pj/auth/internal/repository/model"
 	"context"
 	"log"
 

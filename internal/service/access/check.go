@@ -1,10 +1,11 @@
 package access
 
 import (
-	"auth/internal/utils"
 	"context"
 	"errors"
 	"strings"
+
+	"github.com/pavel-pj/auth/internal/utils"
 
 	"google.golang.org/grpc/metadata"
 )
@@ -54,8 +55,9 @@ func (s *AccessService) Check(ctx context.Context, handler_path string) error {
 func (s *AccessService) accessibleRoles(ctx context.Context) (map[string]string, error) {
 
 	roles := map[string]string{
-		"/user_v1.UserV1/Get":   "ADMIN",
+		"/user_v1.UserV1/Get":   "USER",
 		"/user_v1.UserV1/Store": "ADMIN",
+		"/chat_v1.ChatV1/Store": "USER",
 	}
 
 	return roles, nil

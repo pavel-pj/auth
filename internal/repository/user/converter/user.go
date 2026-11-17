@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"auth/internal/model"
-	modelRepo "auth/internal/repository/user/model"
+	"github.com/pavel-pj/auth/internal/model"
+	modelRepo "github.com/pavel-pj/auth/internal/repository/user/model"
 )
 
 /*

@@ -1,8 +1,8 @@
 package auth
 
 import (
-	desc "auth/pkg/auth_v1"
 	"context"
+	desc "github.com/pavel-pj/auth/pkg/auth_v1"
 )
 
 func (s *AuthImplementation) Login(ctx context.Context, req *desc.LoginRequest) (*desc.LoginResponse, error) {

@@ -1,9 +1,9 @@
 package user
 
 import (
-	repo "auth/internal/repository"
 	"errors"
 	"fmt"
+	repo "github.com/pavel-pj/auth/internal/repository"
 
 	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 

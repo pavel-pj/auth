@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"auth/internal/model"
-	converter "auth/internal/repository/auth/converter"
-	repoModel "auth/internal/repository/auth/model"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
+	converter "github.com/pavel-pj/auth/internal/repository/auth/converter"
+	repoModel "github.com/pavel-pj/auth/internal/repository/auth/model"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pavel-pj/platform_lib/pkg/client/db"

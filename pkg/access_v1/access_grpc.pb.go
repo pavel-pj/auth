@@ -4,7 +4,7 @@
 // - protoc             v7.36.2
 // source: access.proto
 
-package auth_v1
+package access_v1
 
 import (
 	context "context"

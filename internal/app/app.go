@@ -1,15 +1,7 @@
 package app
 
 import (
-	env "auth/internal/config/env"
-	"auth/internal/interceptor"
-	"auth/internal/vault"
-	descAccess "auth/pkg/access_v1"
-	descAuth "auth/pkg/auth_v1"
-	_ "auth/pkg/statik"
-	desc "auth/pkg/user_v1"
 	"context"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -17,6 +9,15 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"time"
+
+	env "github.com/pavel-pj/auth/internal/config/env"
+	"github.com/pavel-pj/auth/internal/interceptor"
+	"github.com/pavel-pj/auth/internal/vault"
+	descAccess "github.com/pavel-pj/auth/pkg/access_v1"
+	descAuth "github.com/pavel-pj/auth/pkg/auth_v1"
+	_ "github.com/pavel-pj/auth/pkg/statik"
+	desc "github.com/pavel-pj/auth/pkg/user_v1"
 
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/cors"
@@ -26,6 +27,7 @@ import (
 	"github.com/pavel-pj/platform_lib/pkg/closer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -167,7 +169,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	//}
 
 	a.grpcServer = grpc.NewServer(
-		//grpc.Creds(credentials.NewTLS(a.vault.TLS.ServerTLS)),
+		grpc.Creds(credentials.NewTLS(a.vault.TLS.ServerTLS)),
 		//grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.ChainUnaryInterceptor(
 			interceptor.ValidateInterceptor,
@@ -192,14 +194,8 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 
 	mux := gwruntime.NewServeMux()
 
-	clientCreds := credentials.NewTLS(&tls.Config{
-		RootCAs:    a.vault.TLS.CAPool,
-		ServerName: a.vault.TLS.ServerName,
-		MinVersion: tls.VersionTLS12,
-	})
-
 	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(clientCreds),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
 	err := desc.RegisterUserV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GetGRPCConfig().Address(), opts)
@@ -218,6 +214,13 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 		Handler:   corsMiddleWare.Handler(mux),
 		TLSConfig: a.vault.TLS.ServerTLS.Clone(),
 	}
+
+	closer.Add(func() error {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		return a.httpServer.Shutdown(ctx)
+
+	})
 
 	return nil
 

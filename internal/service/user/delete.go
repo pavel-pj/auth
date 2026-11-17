@@ -1,9 +1,9 @@
 package user
 
 import (
-	"auth/internal/model"
 	"context"
 	"fmt"
+	"github.com/pavel-pj/auth/internal/model"
 )
 
 func (s UserService) Delete(ctx context.Context, id int64) error {

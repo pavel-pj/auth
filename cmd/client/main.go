@@ -1,11 +1,12 @@
 package main
 
 import (
-	descAccess "auth/pkg/access_v1"
 	"context"
 	"flag"
 	"fmt"
 	"log"
+
+	descAccess "github.com/pavel-pj/auth/pkg/access_v1"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

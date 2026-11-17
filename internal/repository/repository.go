@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"auth/internal/model"
-	logModel "auth/internal/repository/log/model"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
+	logModel "github.com/pavel-pj/auth/internal/repository/log/model"
 )
 
 type UserRepository interface {

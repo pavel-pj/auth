@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"auth/internal/repository"
+	"github.com/pavel-pj/auth/internal/repository"
 
 	"github.com/gojuno/minimock/v3"
 )

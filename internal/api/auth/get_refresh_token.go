@@ -1,8 +1,8 @@
 package auth
 
 import (
-	desc "auth/pkg/auth_v1"
 	"context"
+	desc "github.com/pavel-pj/auth/pkg/auth_v1"
 )
 
 func (a *AuthImplementation) GetRefreshToken(ctx context.Context, req *desc.GetRefreshRequest) (*desc.GetRefreshResponse, error) {

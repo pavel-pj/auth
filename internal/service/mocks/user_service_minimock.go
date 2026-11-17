@@ -5,8 +5,8 @@ package mocks
 //go:generate minimock -i auth/internal/service.UserService -o user_service_minimock.go -n UserServiceMock -p mocks
 
 import (
-	"auth/internal/model"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
 	"sync"
 	mm_atomic "sync/atomic"
 	mm_time "time"

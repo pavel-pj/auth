@@ -1,9 +1,9 @@
 package log
 
 import (
-	"auth/internal/model"
-	"auth/internal/repository/log/converter"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
+	"github.com/pavel-pj/auth/internal/repository/log/converter"
 )
 
 func (s LogService) Store(ctx context.Context, log model.Log) error {

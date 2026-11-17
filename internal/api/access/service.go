@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"auth/internal/service"
-	desc "auth/pkg/access_v1"
+	"github.com/pavel-pj/auth/internal/service"
+	desc "github.com/pavel-pj/auth/pkg/access_v1"
 )
 
 type AccessImplementation struct {

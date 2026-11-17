@@ -1,30 +1,30 @@
 package app
 
 import (
-	//"auth/internal/closer"
-	"auth/internal/config"
+	//"github.com/pavel-pj/auth/internal/closer"
 	"context"
+	"github.com/pavel-pj/auth/internal/config"
 	"log"
 
-	grpcAccessApi "auth/internal/api/access"
-	grpcAuthApi "auth/internal/api/auth"
-	grpcUserApi "auth/internal/api/user"
+	grpcAccessApi "github.com/pavel-pj/auth/internal/api/access"
+	grpcAuthApi "github.com/pavel-pj/auth/internal/api/auth"
+	grpcUserApi "github.com/pavel-pj/auth/internal/api/user"
 
 	db "github.com/pavel-pj/platform_lib/pkg/client/db"
 	pg "github.com/pavel-pj/platform_lib/pkg/client/db/pg"
 
-	env "auth/internal/config/env"
+	env "github.com/pavel-pj/auth/internal/config/env"
 
-	repository "auth/internal/repository"
-	authRepo "auth/internal/repository/auth"
-	logRepo "auth/internal/repository/log"
-	userRepo "auth/internal/repository/user"
+	repository "github.com/pavel-pj/auth/internal/repository"
+	authRepo "github.com/pavel-pj/auth/internal/repository/auth"
+	logRepo "github.com/pavel-pj/auth/internal/repository/log"
+	userRepo "github.com/pavel-pj/auth/internal/repository/user"
 
-	service "auth/internal/service"
-	accessServ "auth/internal/service/access"
-	authServ "auth/internal/service/auth"
-	logServ "auth/internal/service/log"
-	userServ "auth/internal/service/user"
+	service "github.com/pavel-pj/auth/internal/service"
+	accessServ "github.com/pavel-pj/auth/internal/service/access"
+	authServ "github.com/pavel-pj/auth/internal/service/auth"
+	logServ "github.com/pavel-pj/auth/internal/service/log"
+	userServ "github.com/pavel-pj/auth/internal/service/user"
 
 	"github.com/pavel-pj/platform_lib/pkg/client/db/transaction"
 	"github.com/pavel-pj/platform_lib/pkg/closer"

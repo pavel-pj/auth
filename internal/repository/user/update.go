@@ -1,10 +1,10 @@
 package user
 
 import (
-	"auth/internal/model"
-	"auth/internal/repository/user/converter"
-	modelRepo "auth/internal/repository/user/model"
 	"context"
+	"github.com/pavel-pj/auth/internal/model"
+	"github.com/pavel-pj/auth/internal/repository/user/converter"
+	modelRepo "github.com/pavel-pj/auth/internal/repository/user/model"
 	"time"
 
 	"github.com/pavel-pj/platform_lib/pkg/client/db"

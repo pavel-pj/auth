@@ -1,8 +1,8 @@
 package main
 
 import (
-	desc "auth/pkg/user_v1"
 	"context"
+	desc "github.com/pavel-pj/auth/pkg/user_v1"
 	"log"
 	"time"
 

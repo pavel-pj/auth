@@ -1,7 +1,7 @@
 package access
 
 import (
-	"auth/internal/service"
+	"github.com/pavel-pj/auth/internal/service"
 )
 
 var (

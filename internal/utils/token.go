@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"auth/internal/model"
+	"github.com/pavel-pj/auth/internal/model"
 	"time"
 
 	"errors"

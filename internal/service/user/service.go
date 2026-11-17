@@ -1,8 +1,8 @@
 package user
 
 import (
-	repo "auth/internal/repository"
-	serv "auth/internal/service"
+	repo "github.com/pavel-pj/auth/internal/repository"
+	serv "github.com/pavel-pj/auth/internal/service"
 
 	"github.com/pavel-pj/platform_lib/pkg/client/db"
 )
