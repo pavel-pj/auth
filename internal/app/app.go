@@ -134,31 +134,47 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) initVault(ctx context.Context) error {
 	cfg := a.serviceProvider.GetVaultConfig()
 
-	certs, err := vault.Load(ctx, vault.Config{
+	vaultCfg := vault.Config{
 		Address:               cfg.Address(),
 		Token:                 cfg.Token(),
 		RoleID:                cfg.RoleID(),
 		SecretID:              cfg.SecretID(),
 		Mount:                 cfg.KVMount(),
-		SecretPath:            cfg.SecretPath(),
-		ServerName:            cfg.TLSServerName(),
 		JWTSecretPath:         cfg.JWTSecretPath(),
 		JWTAccessSecretField:  cfg.JWTAccessSecretField(),
 		JWTRefreshSecretField: cfg.JWTRefreshSecretField(),
-	})
-	if err != nil {
-		return fmt.Errorf("init vault: %w", err)
+
+		PKIMount:      cfg.PKIMount(),
+		PKIRole:       cfg.PKIRole(),
+		PKICommonName: cfg.PKICommonName(),
+		PKITTL:        cfg.PKITTL(),
+		RootCAFile:    cfg.RootCAFile(),
 	}
 
-	a.vault = certs
+	jwt, err := vault.LoadJWT(ctx, vaultCfg)
+	if err != nil {
+		return fmt.Errorf("init vault jwt: %w", err)
+	}
+
+	tlsConfig, err := vault.LoadPKI(ctx, vaultCfg)
+	if err != nil {
+		return fmt.Errorf("init vault pki: %w", err)
+	}
+
+	a.vault = &vault.Secret{
+		TLS: tlsConfig,
+		JWT: jwt,
+	}
+
 	a.serviceProvider.SetJWTSecrets(
-		certs.JWT.AccessTokenSecret,
-		certs.JWT.RefreshTokenSecret,
+		jwt.AccessTokenSecret,
+		jwt.RefreshTokenSecret,
 	)
 
-	log.Printf("TLS certificates and JWT secrets loaded from Vault")
+	log.Printf("TLS from Vault PKI and JWT secrets loaded")
 
 	return nil
+
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {

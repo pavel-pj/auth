@@ -1,4 +1,6 @@
-# auth — сервис пользователей (gRPC + REST + Swagger)
+ 
+
+# auth — сервис пользователей (gRPC + REST + Swagger) qwerqwer 
 
 Микросервис авторизации/пользователей на Go: gRPC-сервер, HTTP/JSON через `grpc-gateway`, валидация через Protovalidate, PostgreSQL, миграции через `goose`, Swagger UI, встроенный в бинарник через `statik`.
 

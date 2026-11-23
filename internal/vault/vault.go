@@ -22,6 +22,12 @@ type Config struct {
 	JWTSecretPath         string
 	JWTAccessSecretField  string
 	JWTRefreshSecretField string
+
+	PKIMount      string
+	PKIRole       string
+	PKICommonName string
+	PKITTL        string
+	RootCAFile    string
 }
 
 type TLS struct {
@@ -40,68 +46,33 @@ type Secret struct {
 	JWT JWT
 }
 
-func Load(ctx context.Context, cfg Config) (*Secret, error) {
+func LoadJWT(ctx context.Context, cfg Config) (JWT, error) {
 	client, err := newClient(ctx, cfg)
 	if err != nil {
-		return nil, fmt.Errorf("vault client: %w", err)
+		return JWT{}, fmt.Errorf("vault jwt: client: %w", err)
 	}
 
-	secret, err := client.KVv2(cfg.Mount).Get(ctx, cfg.SecretPath)
+	secret, err := client.KVv2(cfg.Mount).Get(ctx, cfg.JWTSecretPath)
 	if err != nil {
-		return nil, fmt.Errorf("vault read %s/%s: %w", cfg.Mount, cfg.SecretPath, err)
+		return JWT{}, fmt.Errorf("vault jwt: read %s/%s: %w", cfg.Mount, cfg.JWTSecretPath, err)
 	}
 	if secret == nil || secret.Data == nil {
-		return nil, fmt.Errorf("vault: secret %s/%s not found", cfg.Mount, cfg.SecretPath)
+		return JWT{}, fmt.Errorf("vault jwt: secret %s/%s not found", cfg.Mount, cfg.JWTSecretPath)
 	}
 
-	certPEM, _ := secret.Data["cert"].(string)
-	keyPEM, _ := secret.Data["key"].(string)
-	caPEM, _ := secret.Data["ca"].(string)
-	if certPEM == "" || keyPEM == "" || caPEM == "" {
-		return nil, fmt.Errorf("vault: fields cert/key/ca are required")
+	access, ok := secret.Data[cfg.JWTAccessSecretField].(string)
+	if !ok || access == "" {
+		return JWT{}, fmt.Errorf("vault jwt: field %q is empty", cfg.JWTAccessSecretField)
 	}
 
-	pair, err := tls.X509KeyPair([]byte(certPEM), []byte(keyPEM))
-	if err != nil {
-		return nil, fmt.Errorf("vault: parse key pair: %w", err)
+	refresh, ok := secret.Data[cfg.JWTRefreshSecretField].(string)
+	if !ok || refresh == "" {
+		return JWT{}, fmt.Errorf("vault jwt: field %q is empty", cfg.JWTRefreshSecretField)
 	}
 
-	pool := x509.NewCertPool()
-	if !pool.AppendCertsFromPEM([]byte(caPEM)) {
-		return nil, fmt.Errorf("vault: parse ca")
-	}
-
-	jwtSecret, err := client.KVv2(cfg.Mount).Get(ctx, cfg.JWTSecretPath)
-	if err != nil {
-		return nil, fmt.Errorf("vault read %s/%s: %w", cfg.Mount, cfg.JWTSecretPath, err)
-	}
-	if jwtSecret == nil || jwtSecret.Data == nil {
-		return nil, fmt.Errorf("vault: secret %s/%s not found", cfg.Mount, cfg.JWTSecretPath)
-	}
-
-	accessSecret, ok := jwtSecret.Data[cfg.JWTAccessSecretField].(string)
-	if !ok || accessSecret == "" {
-		return nil, fmt.Errorf("vault: field %q is empty or not a string", cfg.JWTAccessSecretField)
-	}
-
-	refreshSecret, ok := jwtSecret.Data[cfg.JWTRefreshSecretField].(string)
-	if !ok || refreshSecret == "" {
-		return nil, fmt.Errorf("vault: field %q is empty or not a string", cfg.JWTRefreshSecretField)
-	}
-
-	return &Secret{
-		TLS: TLS{
-			ServerTLS: &tls.Config{
-				Certificates: []tls.Certificate{pair},
-				MinVersion:   tls.VersionTLS12,
-			},
-			CAPool:     pool,
-			ServerName: cfg.ServerName,
-		},
-		JWT: JWT{
-			AccessTokenSecret:  accessSecret,
-			RefreshTokenSecret: refreshSecret,
-		},
+	return JWT{
+		AccessTokenSecret:  access,
+		RefreshTokenSecret: refresh,
 	}, nil
 }
 

@@ -28,4 +28,10 @@ type VaultConfig interface {
 	JWTSecretPath() string
 	JWTAccessSecretField() string
 	JWTRefreshSecretField() string
+
+	PKIMount() string
+	PKIRole() string
+	PKICommonName() string
+	PKITTL() string
+	RootCAFile() string
 }

@@ -18,6 +18,12 @@ type VaultConfig struct {
 	jwtSecretPath         string
 	jwtAccessSecretField  string
 	jwtRefreshSecretField string
+
+	pkiMount      string
+	pkiRole       string
+	pkiCommonName string
+	pkiTTL        string
+	rootCAFile    string
 }
 
 func NewVaultConfig() (VaultConfig, error) {
@@ -39,6 +45,12 @@ func NewVaultConfig() (VaultConfig, error) {
 	cfg.jwtSecretPath = getEnv("VAULT_JWT_SECRET_PATH", "auth/jwt")
 	cfg.jwtAccessSecretField = getEnv("VAULT_JWT_ACCESS_SECRET_FIELD", "AccessTokenSecret")
 	cfg.jwtRefreshSecretField = getEnv("VAULT_JWT_REFRESH_SECRET_FIELD", "RefreshTokenSecret")
+
+	cfg.pkiMount = getEnv("VAULT_PKI_MOUNT", "pki")
+	cfg.pkiRole = getEnv("VAULT_PKI_ROLE", "auth")
+	cfg.pkiCommonName = getEnv("VAULT_PKI_COMMON_NAME", "localhost")
+	cfg.pkiTTL = getEnv("VAULT_PKI_TTL", "720h")
+	cfg.rootCAFile = getEnv("VAULT_ROOT_CA_FILE", "")
 
 	return cfg, nil
 }
@@ -81,4 +93,20 @@ func (s VaultConfig) JWTRefreshSecretField() string {
 
 func (s VaultConfig) JWTSecretPath() string {
 	return s.jwtSecretPath
+}
+
+func (s VaultConfig) PKIMount() string {
+	return s.pkiMount
+}
+func (s VaultConfig) PKIRole() string {
+	return s.pkiRole
+}
+func (s VaultConfig) PKICommonName() string {
+	return s.pkiCommonName
+}
+func (s VaultConfig) PKITTL() string {
+	return s.pkiTTL
+}
+func (s VaultConfig) RootCAFile() string {
+	return s.rootCAFile
 }

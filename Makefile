@@ -14,8 +14,7 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.33.0
 	GOBIN=$(LOCAL_BIN) go install github.com/rakyll/statik@v0.1.7
 
-
-
+ 
 generate: 
 	make generate-user-api 
 	make generate-auth-api 
