@@ -24,6 +24,7 @@ import (
 
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pavel-pj/auth/internal/logger"
 	"github.com/pavel-pj/platform_lib/pkg/closer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -184,12 +185,18 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	//	log.Fatalf("Could not load tls sertificate:%w", err)
 	//}
 
+	//logger.Init(logger.GetCore(logger.GetAtomicLevel("debug")))
+
+	logger.Init(a.serviceProvider.GetLoggerConfig())
+
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(credentials.NewTLS(a.vault.TLS.ServerTLS)),
 		//grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.ChainUnaryInterceptor(
+			interceptor.RecoveryInterceptor,
 			interceptor.ValidateInterceptor,
-			interceptor.RecoveryInterceptor),
+			interceptor.LoggerInterceptor,
+		),
 	)
 	// Только для тестовой среды - для удобства работы в Postman
 	reflection.Register(a.grpcServer)

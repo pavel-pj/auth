@@ -58,6 +58,7 @@ func (s *AccessService) accessibleRoles(ctx context.Context) (map[string]string,
 		"/user_v1.UserV1/Get":   "USER",
 		"/user_v1.UserV1/Store": "ADMIN",
 		"/chat_v1.ChatV1/Store": "USER",
+		"/chat_v1.ChatV1/Get":   "USER",
 	}
 
 	return roles, nil

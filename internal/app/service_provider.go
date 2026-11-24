@@ -3,8 +3,9 @@ package app
 import (
 	//"github.com/pavel-pj/auth/internal/closer"
 	"context"
-	"github.com/pavel-pj/auth/internal/config"
 	"log"
+
+	"github.com/pavel-pj/auth/internal/config"
 
 	grpcAccessApi "github.com/pavel-pj/auth/internal/api/access"
 	grpcAuthApi "github.com/pavel-pj/auth/internal/api/auth"
@@ -36,6 +37,7 @@ type serviceProvider struct {
 	httpConfig    config.HTTPConfig
 	swaggerConfig config.SwaggerConfig
 	vaultConfig   config.VaultConfig
+	loggerConfig  config.LoggerConfig
 
 	//pgPool *pgxpool.Pool
 	pgClient  db.Client
@@ -135,6 +137,18 @@ func (s *serviceProvider) GetVaultConfig() config.VaultConfig {
 	}
 
 	return s.vaultConfig
+}
+
+func (s *serviceProvider) GetLoggerConfig() config.LoggerConfig {
+	if s.loggerConfig == nil {
+		conf, err := env.NewLoggerConfig()
+		if err != nil {
+			log.Fatalf("failed to get logger config: %s", err.Error())
+		}
+		s.loggerConfig = conf
+	}
+
+	return s.loggerConfig
 }
 
 func (s *serviceProvider) GetDBClient(ctx context.Context) db.Client {

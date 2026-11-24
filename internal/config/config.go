@@ -35,3 +35,11 @@ type VaultConfig interface {
 	PKITTL() string
 	RootCAFile() string
 }
+
+type LoggerConfig interface {
+	Level() string
+	Filename() string
+	MaxSize() int
+	MaxBackups() int
+	MaxAge() int
+}
