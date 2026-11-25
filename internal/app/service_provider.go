@@ -32,12 +32,13 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig      config.PGConfig
-	grpcConfig    config.GRPCConfig
-	httpConfig    config.HTTPConfig
-	swaggerConfig config.SwaggerConfig
-	vaultConfig   config.VaultConfig
-	loggerConfig  config.LoggerConfig
+	pgConfig        config.PGConfig
+	grpcConfig      config.GRPCConfig
+	httpConfig      config.HTTPConfig
+	swaggerConfig   config.SwaggerConfig
+	vaultConfig     config.VaultConfig
+	loggerConfig    config.LoggerConfig
+	prometeusConfig config.PrometeusConfig
 
 	//pgPool *pgxpool.Pool
 	pgClient  db.Client
@@ -149,6 +150,21 @@ func (s *serviceProvider) GetLoggerConfig() config.LoggerConfig {
 	}
 
 	return s.loggerConfig
+}
+
+func (s *serviceProvider) GetPrometeusConfig() config.PrometeusConfig {
+
+	if s.prometeusConfig == nil {
+		conf, err := env.NewPrometeusConfig()
+		if err != nil {
+			log.Fatalf("failed to get prometeus config: %s", err.Error())
+		}
+
+		s.prometeusConfig = conf
+	}
+
+	return s.prometeusConfig
+
 }
 
 func (s *serviceProvider) GetDBClient(ctx context.Context) db.Client {

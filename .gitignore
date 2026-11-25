@@ -2,3 +2,4 @@ bin/
 vendor.protogen
 /certs
 /.env
+/log/app.log

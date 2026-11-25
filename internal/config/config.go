@@ -43,3 +43,9 @@ type LoggerConfig interface {
 	MaxBackups() int
 	MaxAge() int
 }
+
+type PrometeusConfig interface {
+	Address() string
+	Namespace() string
+	AppName() string
+}

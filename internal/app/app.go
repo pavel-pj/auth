@@ -18,6 +18,7 @@ import (
 	descAuth "github.com/pavel-pj/auth/pkg/auth_v1"
 	_ "github.com/pavel-pj/auth/pkg/statik"
 	desc "github.com/pavel-pj/auth/pkg/user_v1"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/cors"
@@ -25,6 +26,7 @@ import (
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pavel-pj/auth/internal/logger"
+	"github.com/pavel-pj/auth/internal/metric"
 	"github.com/pavel-pj/platform_lib/pkg/closer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -40,6 +42,7 @@ type App struct {
 	grpcServer      *grpc.Server
 	httpServer      *http.Server
 	swaggerServer   *http.Server
+	prometeusServer *http.Server
 	vault           *vault.Secret
 }
 
@@ -64,7 +67,7 @@ func (a *App) Run() error {
 
 	var wg sync.WaitGroup
 
-	wg.Add(3)
+	wg.Add(4)
 	go func() {
 		defer wg.Done()
 		err := a.runGRPCServer()
@@ -92,6 +95,15 @@ func (a *App) Run() error {
 		}
 	}()
 
+	go func() {
+		defer wg.Done()
+
+		err := a.runPrometuesServer()
+		if err != nil {
+			log.Fatalf("failed to start prometeus server: %v", err)
+		}
+	}()
+
 	wg.Wait()
 
 	return nil
@@ -106,6 +118,7 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initGRPCServer,
 		a.initHTTPServer,
 		a.initSwaggerServer,
+		a.initPrometeus,
 	}
 
 	for _, f := range inits {
@@ -187,6 +200,11 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	//logger.Init(logger.GetCore(logger.GetAtomicLevel("debug")))
 
+	err := metric.Init(ctx, a.serviceProvider.GetPrometeusConfig())
+	if err != nil {
+		return err
+	}
+
 	logger.Init(a.serviceProvider.GetLoggerConfig())
 
 	a.grpcServer = grpc.NewServer(
@@ -194,6 +212,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 		//grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.ChainUnaryInterceptor(
 			interceptor.RecoveryInterceptor,
+			interceptor.MetricInterceptor,
 			interceptor.ValidateInterceptor,
 			interceptor.LoggerInterceptor,
 		),
@@ -357,4 +376,29 @@ func serveSwaggerFile(path string) http.HandlerFunc {
 		log.Printf("Served swagger file: %s", path)
 
 	}
+}
+
+func (a *App) initPrometeus(_ context.Context) error {
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+
+	a.prometeusServer = &http.Server{
+		Addr:    a.serviceProvider.GetPrometeusConfig().Address(),
+		Handler: mux,
+	}
+
+	return nil
+}
+
+func (a *App) runPrometuesServer() error {
+	log.Printf("Prometeus server is running on %s", a.prometeusServer.Addr)
+
+	closer.Add(func() error {
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+		defer cancel()
+		return a.prometeusServer.Shutdown(ctx)
+
+	})
+	return a.prometeusServer.ListenAndServe()
+
 }

@@ -136,3 +136,13 @@ gen-cert:
 	openssl req -new -key service.key -out service.csr -config certificate.conf
 	openssl x509 -req -in service.csr -CA ca.cert -CAkey ca.key -CAcreateserial \
 		-out service.pem -days 365 -sha256 -extfile certificate.conf -extensions req_ext
+
+
+grpc-load-test:
+	ghz \
+	    --call user_v1.UserV1.Get \
+		--data '{"id": 1}' \
+		--rps 1000 \
+		--cacert /home/user200/web/go/VAULT-KEYS/root-ca.crt \
+		--total 5000 \
+		localhost:50560

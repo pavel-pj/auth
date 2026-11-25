@@ -15,13 +15,21 @@ services:
     networks:
       - auth-net
  
-      
+  prometheus:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    image: prom/prometheus:v2.37.9
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus_data:/prometheus    
 
-      
  
-
 volumes:
   pgdata:
+  prometheus_data:
 
 networks:
   auth-net:
