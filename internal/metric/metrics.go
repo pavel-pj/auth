@@ -9,7 +9,9 @@ import (
 )
 
 type Metrics struct {
-	requestCounter prometheus.Counter
+	requestCounter        prometheus.Counter
+	responseCounter       *prometheus.CounterVec
+	histogramResponseTime *prometheus.HistogramVec
 }
 
 var metrics *Metrics
@@ -21,8 +23,29 @@ func Init(_ context.Context, cfg config.PrometeusConfig) error {
 				Namespace: cfg.Namespace(),
 				Subsystem: "grpc",
 				Name:      cfg.AppName() + "_request_total",
-				Help:      "Количество запросов в секунду",
+				Help:      "Количество запросов к серверу",
 			},
+		),
+
+		responseCounter: promauto.NewCounterVec(
+			prometheus.CounterOpts{
+				Namespace: cfg.Namespace(),
+				Subsystem: "grpc",
+				Name:      cfg.AppName() + "_response_total",
+				Help:      "Количество ответов от сервера",
+			},
+			[]string{"status", "method"},
+		),
+
+		histogramResponseTime: promauto.NewHistogramVec(
+			prometheus.HistogramOpts{
+				Namespace: cfg.Namespace(),
+				Subsystem: "grpc",
+				Name:      cfg.AppName() + "_histogram_response_time_seconds",
+				Help:      "Время ответа от сервера",
+				Buckets:   prometheus.ExponentialBuckets(0.0001, 2, 16),
+			},
+			[]string{"status"},
 		),
 	}
 
@@ -32,4 +55,12 @@ func Init(_ context.Context, cfg config.PrometeusConfig) error {
 
 func IncRequestCounter() {
 	metrics.requestCounter.Inc()
+}
+
+func IncResponseCounter(status string, method string) {
+	metrics.responseCounter.WithLabelValues(status, method).Inc()
+}
+
+func HistogramResponseTimeObserve(status string, time float64) {
+	metrics.histogramResponseTime.WithLabelValues(status).Observe(time)
 }

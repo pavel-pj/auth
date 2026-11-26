@@ -48,4 +48,6 @@ type PrometeusConfig interface {
 	Address() string
 	Namespace() string
 	AppName() string
+	UIPort() string
+	GrafanaPort() string
 }

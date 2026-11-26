@@ -11,8 +11,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	"github.com/opentracing/opentracing-go"
 	env "github.com/pavel-pj/auth/internal/config/env"
 	"github.com/pavel-pj/auth/internal/interceptor"
+	"github.com/pavel-pj/auth/internal/tracing"
 	"github.com/pavel-pj/auth/internal/vault"
 	descAccess "github.com/pavel-pj/auth/pkg/access_v1"
 	descAuth "github.com/pavel-pj/auth/pkg/auth_v1"
@@ -200,6 +203,8 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	//logger.Init(logger.GetCore(logger.GetAtomicLevel("debug")))
 
+	serviceName := "auth-service"
+
 	err := metric.Init(ctx, a.serviceProvider.GetPrometeusConfig())
 	if err != nil {
 		return err
@@ -207,10 +212,13 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	logger.Init(a.serviceProvider.GetLoggerConfig())
 
+	tracing.Init(logger.Logger(), serviceName)
+
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(credentials.NewTLS(a.vault.TLS.ServerTLS)),
 		//grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.ChainUnaryInterceptor(
+			otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 			interceptor.RecoveryInterceptor,
 			interceptor.MetricInterceptor,
 			interceptor.ValidateInterceptor,
@@ -392,6 +400,8 @@ func (a *App) initPrometeus(_ context.Context) error {
 
 func (a *App) runPrometuesServer() error {
 	log.Printf("Prometeus server is running on %s", a.prometeusServer.Addr)
+	log.Printf("Prometeus UI panel %s", a.serviceProvider.prometeusConfig.UIPort())
+	log.Printf("Grafana UI panel %s", a.serviceProvider.prometeusConfig.GrafanaPort())
 
 	closer.Add(func() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)

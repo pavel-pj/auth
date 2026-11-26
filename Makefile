@@ -142,7 +142,8 @@ grpc-load-test:
 	ghz \
 	    --call user_v1.UserV1.Get \
 		--data '{"id": 1}' \
-		--rps 1000 \
+		--rps 200 \
+		--concurrency 200 \
 		--cacert /home/user200/web/go/VAULT-KEYS/root-ca.crt \
-		--total 5000 \
+		--total 4000 \
 		localhost:50560

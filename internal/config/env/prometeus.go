@@ -8,10 +8,12 @@ import (
 )
 
 type PrometeusConfig struct {
-	host      string
-	port      string
-	namespace string
-	appName   string
+	host        string
+	port        string
+	namespace   string
+	appName     string
+	uiPort      string
+	grafanaPort string
 }
 
 func NewPrometeusConfig() (PrometeusConfig, error) {
@@ -25,6 +27,8 @@ func NewPrometeusConfig() (PrometeusConfig, error) {
 	cfg.port = getEnv("PROMETEUS_HTTP_PORT", "6060")
 	cfg.namespace = getEnv("PROMETEUS_NAMESPACE", "test_namespace")
 	cfg.appName = getEnv("PROMETEUS_APP_NAME", "test_app_name")
+	cfg.uiPort = getEnv("PROMETEUS_UI_PORT", "")
+	cfg.grafanaPort = getEnv("GRAFANA_PORT", "3000")
 
 	return cfg, nil
 }
@@ -38,4 +42,12 @@ func (s PrometeusConfig) Namespace() string {
 }
 func (s PrometeusConfig) AppName() string {
 	return s.appName
+}
+
+func (s PrometeusConfig) UIPort() string {
+	return s.uiPort
+}
+
+func (s PrometeusConfig) GrafanaPort() string {
+	return s.grafanaPort
 }

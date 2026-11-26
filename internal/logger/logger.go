@@ -72,3 +72,7 @@ func getCore(cfg config.LoggerConfig) zapcore.Core {
 	)
 
 }
+
+func Logger() *zap.Logger {
+	return globbalLogger
+}
