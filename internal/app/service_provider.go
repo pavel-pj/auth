@@ -1,9 +1,12 @@
 package app
 
 import (
-	//"github.com/pavel-pj/auth/internal/closer"
 	"context"
 	"log"
+	"sync"
+	"time"
+
+	ratelimiter "github.com/pavel-pj/auth/internal/rate_limiter"
 
 	"github.com/pavel-pj/auth/internal/config"
 
@@ -39,6 +42,9 @@ type serviceProvider struct {
 	vaultConfig     config.VaultConfig
 	loggerConfig    config.LoggerConfig
 	prometeusConfig config.PrometeusConfig
+
+	rateLimiterOnce sync.Once
+	rateLimiter     *ratelimiter.TokenBucketLimiter
 
 	//pgPool *pgxpool.Pool
 	pgClient  db.Client
@@ -165,6 +171,17 @@ func (s *serviceProvider) GetPrometeusConfig() config.PrometeusConfig {
 
 	return s.prometeusConfig
 
+}
+
+func (s *serviceProvider) GetRateLimiter(ctx context.Context) *ratelimiter.TokenBucketLimiter {
+
+	limit := 20
+
+	s.rateLimiterOnce.Do(func() {
+		s.rateLimiter = ratelimiter.NewTokenBucketLimiter(ctx, limit, time.Second)
+
+	})
+	return s.rateLimiter
 }
 
 func (s *serviceProvider) GetDBClient(ctx context.Context) db.Client {

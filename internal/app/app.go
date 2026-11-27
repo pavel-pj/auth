@@ -196,13 +196,6 @@ func (a *App) initVault(ctx context.Context) error {
 
 func (a *App) initGRPCServer(ctx context.Context) error {
 
-	//creds, err := credentials.NewServerTLSFromFile("service.pem", "service.key")
-	//if err != nil {
-	//	log.Fatalf("Could not load tls sertificate:%w", err)
-	//}
-
-	//logger.Init(logger.GetCore(logger.GetAtomicLevel("debug")))
-
 	serviceName := "auth-service"
 
 	err := metric.Init(ctx, a.serviceProvider.GetPrometeusConfig())
@@ -211,13 +204,14 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	}
 
 	logger.Init(a.serviceProvider.GetLoggerConfig())
-
 	tracing.Init(logger.Logger(), serviceName)
 
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(credentials.NewTLS(a.vault.TLS.ServerTLS)),
 		//grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.ChainUnaryInterceptor(
+			interceptor.RequestTimeOut(2*time.Second),
+			interceptor.NewInterceptorRateLimiter(a.serviceProvider.GetRateLimiter(ctx)).Unary,
 			otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 			interceptor.RecoveryInterceptor,
 			interceptor.MetricInterceptor,
